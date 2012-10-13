@@ -1,0 +1,59 @@
+=== Quick Paypal Payments ===
+
+Contributors: 
+Tags: contact form
+Requires at least: 2.7
+Tested up to: 3.4.2
+Stable tag: trunk
+
+Zero to PayPal with just one shortcode
+
+== Description ==
+
+Taking PayPal payments just got easier, one shortcode to collect any amount from anywhere on your site
+
+= Features =
+
+*	Accepts any currency
+*	Fixed or variable payment amounts
+*	Easy to use shortcode
+*	Multi-language
+
+= Developers plugin page =
+
+[quick paypal payments plugin](http://quick-plugins.com/quick-paypal-payments/).
+
+== Screenshots ==
+Coming soon...
+
+== Installation ==
+
+1.	Download the plugin.
+2.	Login to your wordpress dashboard.
+3.	Go to 'Plugins', 'Add New' then 'Upload'.
+4.	Browse to the downloaded plugin then then 'Install Now'.
+5.	Activate the plugin.
+6.	Go to the plugin 'Settings' page to add you paypal email address and currency
+7.	Edit any of the form settings if you wish.
+8.	Use the shortcode `[qpp]` in you posts or page or even your sidebar.
+10.	To use the form in your theme files use the code `<?php echo do_shortcode('[qpp]'); ?>`.
+
+== Frequently Asked Questions ==
+
+= How do I change the labels and captions? =
+Go to your plugin list and scroll down until you see 'Quick Paypal Payments' and click on 'Settings'.
+
+= What's the shortcode? =
+[qpp]
+
+= How do I change the colours? =
+Edit the 'quick-paypal-plugin-styles.css'.
+
+= It's all gone wrong! =
+If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
+
+
+== Changelog ==
+
+= 1.0 =
+*	Initial Issue

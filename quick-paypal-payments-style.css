@@ -1,0 +1,70 @@
+#qpp-style {
+	font-family: arial, sans-serif;
+	text-align: left;
+	margin: 0 0 20px 0;
+	padding: 0;
+	}
+
+#qpp-style form {
+	margin: 0;
+	padding: 0;
+	}
+
+#qpp-style input {
+	font-family: arial, sans-serif;
+	margin: 5px 0 0 0;
+	padding: 6px;
+	color: #465069;
+	font-size: 110%;
+	border:1px solid #415063;
+	width: 266px;
+	}
+
+#qpp-style input:focus {
+	background:#FFFFCC;
+	}
+
+#qpp-style .payment {
+	color: #465069;
+	text-align: left;
+	font-size: 110%;
+	margin: 0;
+	font-weight: normal;
+	padding: 6px 0 0 0
+	width: 266px;
+	}
+
+#qpp-style #submit {
+	color: #FFF;
+	background: #343838;
+	text-align: center;
+	cursor: pointer;
+	width: 280px;
+	}
+
+#qpp-style .error {
+	color: #D31900;
+	font-weight: bold;
+	}
+
+#qpp-options {
+	border: 1px solid #C3CFF5;
+	padding: 0 10px 10px 10px;
+	margin: 10px 10px 0 10px ;
+	float: left;
+	width: 45%;
+	}
+
+#qpp-options h2 {
+	color: #005F6B;
+	}
+
+#qpp-options h3 {
+	color: #717DD7;
+	margin: 4px 0 0 0;
+	padding: 0;
+	}
+
+#qpp-options submit input:focus {
+	color: #FFF;
+	}
