@@ -2,8 +2,8 @@
 /*
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
-Description: Accepts any amount or payment ID before submitting to paypal 
-Version: 1.0
+Description: Accept any amount or payment ID before submitting to paypal 
+Version: 1.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -18,12 +18,21 @@ add_filter( 'plugin_action_links', 'qpp_plugin_action_links', 10, 2 );
 register_uninstall_hook(__FILE__, 'qpp_delete_options');
 
 $scripturl = plugins_url('quick-paypal-payments-javascript.js', __FILE__);
-wp_register_script('qpp_script', $scripturl);
-wp_enqueue_script( 'qpp_script');
+	wp_register_script('qpp_script', $scripturl);
+	wp_enqueue_script( 'qpp_script');
 
-$styleurl = plugins_url('quick-paypal-payments-style.css', __FILE__);
-wp_register_style('qpp_style', $styleurl);
-wp_enqueue_style( 'qpp_style');
+$qpp = qpp_get_stored_options();
+if ( $qpp['styles'] == 'plugin') {
+	$styleurl = plugins_url('quick-paypal-payments-style.css', __FILE__);
+	wp_register_style('qpp_style', $styleurl);
+	wp_enqueue_style( 'qpp_style');
+	}
+
+if (is_admin() ) {
+$adminurl = plugins_url('quick-paypal-payments-admin.css', __FILE__);
+	wp_register_style('qpp_admin', $adminurl);
+	wp_enqueue_style( 'qpp_admin');
+	}
 
 function qpp_page_init() {
 	add_options_page('Quick Paypal', 'Quick Paypal', 'manage_options', __FILE__, 'qpp_settings');
@@ -60,10 +69,12 @@ function qpp_settings()
 		$qpp['cancelurl'] = stripslashes( $_POST['qpp_cancelurl']);
 		$qpp['thanksurl'] = stripslashes( $_POST['qpp_thanksurl']);
 		$qpp['target'] = $_POST['qpp_target'];
+		$qpp['styles'] = $_POST['qpp_styles'];
 		update_option( 'qpp_options', $qpp);
 		qpp_admin_notice("The plugin settings have been updated.");
 		}
-	$$qpp['target'] = 'checked'; 
+	$$qpp['target'] = 'checked';
+	$$qpp['styles'] = 'checked';
 	$content = '
 	<div id="qpp-options"> 
 	<div id="qpp-style">
@@ -96,6 +107,9 @@ function qpp_settings()
 	<input type="text" style="width:90%" name="qpp_cancelurl" value="' . $qpp['cancelurl'] . '" />
 	<h3>URL of thank you page</h3>
 	<input type="text" style="width:90%" name="qpp_thanksurl" value="' . $qpp['thanksurl'] . '" />
+	<h2>Styles</h2>
+	<p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="plugin" ' . $plugin . ' /> Use plugin styles<br>
+	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="theme" ' . $theme . ' /> Use theme styles</p>
 	<h2>Paypal Link</h2>
 	<p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_target" value="newpage" ' . $newpage . ' /> Open link in new page/tab<br>
 	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_target" value="current" ' . $current . ' /> Open in existing page</p>
@@ -267,6 +281,7 @@ function qpp_get_default_options () {
 	$qpp['submitcaption'] = 'Make Payment';
 	$qpp['cancelurl'] = '';
 	$qpp['thanksurl'] = '';
-	$qpp['target'] = 'newpage';
+	$qpp['target'] = 'current';
+	$qpp['styles'] = 'plugin';
 	return $qpp;
 	}

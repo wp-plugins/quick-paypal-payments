@@ -47,13 +47,17 @@ Go to your plugin list and scroll down until you see 'Quick Paypal Payments' and
 [qpp]
 
 = How do I change the colours? =
-Edit the 'quick-paypal-plugin-styles.css'.
+Edit the 'quick-paypal-payment-styles.css'.
+Or change the options to use your theme stylesheet
 
 = It's all gone wrong! =
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
 
 == Changelog ==
+
+= 1.1 =
+*	Added choice of plugin or theme styles
 
 = 1.0 =
 *	Initial Issue
