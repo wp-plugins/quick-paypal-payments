@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 1.1
+Version: 1.2
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -12,6 +12,7 @@ add_shortcode('qpp', 'qpp_payment');
 add_action('admin_menu', 'qpp_page_init');
 add_action( 'admin_notices', 'qpp_admin_notice' );
 add_action( 'widgets_init', create_function('', 'return register_widget("qpp_payment_widget");') );
+add_action('wp_head', 'qpp_use_custom_css');
 add_filter( 'plugin_action_links', 'qpp_plugin_action_links', 10, 2 );
 
 /* register_deactivation_hook( __FILE__, 'qpp_delete_options' ); */
@@ -22,7 +23,7 @@ $scripturl = plugins_url('quick-paypal-payments-javascript.js', __FILE__);
 	wp_enqueue_script( 'qpp_script');
 
 $qpp = qpp_get_stored_options();
-if ( $qpp['styles'] == 'plugin') {
+if ( $qpp['styles'] == 'plugin'  || $qpp['styles'] == 'custom') {
 	$styleurl = plugins_url('quick-paypal-payments-style.css', __FILE__);
 	wp_register_style('qpp_style', $styleurl);
 	wp_enqueue_style( 'qpp_style');
@@ -70,6 +71,7 @@ function qpp_settings()
 		$qpp['thanksurl'] = stripslashes( $_POST['qpp_thanksurl']);
 		$qpp['target'] = $_POST['qpp_target'];
 		$qpp['styles'] = $_POST['qpp_styles'];
+		$qpp['custom'] = $_POST['qpp_custom'];
 		update_option( 'qpp_options', $qpp);
 		qpp_admin_notice("The plugin settings have been updated.");
 		}
@@ -81,6 +83,7 @@ function qpp_settings()
 	<h2>Paypal Payments </h2>
 	<p>Use the <a href="' . get_admin_url() . '/wp-admin/widgets.php">widget manager</a> to add a payment form to a sidebar or use the shortcode [qpp] in your posts and pages.</p>
 	<p>The sortcode supports two parameters: <em>id</em> and <em>amount</em>. There are shortcode examples on the right.</p>
+	<p>You can only have one payment form per page. I&#146;ve tried to get multiple forms to work but failed miserably. Hopefully in the future I&#146;ll get it to work properly.</p>
 	<form action="" method="POST">
 	<p><span style="color:red; font-weight: bold;">Important!</span> Enter your PAYPAL email address and currency code below and save the changes.</p>
 	<h3>Email address</h3>
@@ -109,7 +112,10 @@ function qpp_settings()
 	<input type="text" style="width:90%" name="qpp_thanksurl" value="' . $qpp['thanksurl'] . '" />
 	<h2>Styles</h2>
 	<p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="plugin" ' . $plugin . ' /> Use plugin styles<br>
-	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="theme" ' . $theme . ' /> Use theme styles</p>
+	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="theme" ' . $theme . ' /> Use theme styles<br>
+	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="custom" ' . $custom . ' /> Use custom styles (add to text editor below)</p>
+	<p><textarea style="width:100%; height: 200px" name="qpp_custom">' . $qpp['custom'] . '</textarea></p>
+	</p>
 	<h2>Paypal Link</h2>
 	<p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_target" value="newpage" ' . $newpage . ' /> Open link in new page/tab<br>
 	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_target" value="current" ' . $current . ' /> Open in existing page</p>
@@ -262,6 +268,14 @@ function current_page_url() {
 	return $pageURL;
 }
 
+function qpp_use_custom_css () {
+	$qpp = qpp_get_stored_options();
+	if ($qpp['styles'] == 'custom') {
+		$code = "<style type=\"text/css\" media=\"screen\">\r\n" . $qpp['custom'] . "\r\n</style>\r\n";
+		echo $code;
+		}
+	}
+
 function qpp_get_stored_options () {
 	$qpp = get_option('qpp_options');
 	if(!is_array($qpp)) $qpp = array();
@@ -283,5 +297,6 @@ function qpp_get_default_options () {
 	$qpp['thanksurl'] = '';
 	$qpp['target'] = 'current';
 	$qpp['styles'] = 'plugin';
+	$qpp['custom'] = "#qpp-style {\r\n\r\n}";
 	return $qpp;
 	}

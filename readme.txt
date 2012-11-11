@@ -47,14 +47,19 @@ Go to your plugin list and scroll down until you see 'Quick Paypal Payments' and
 [qpp]
 
 = How do I change the colours? =
-Edit the 'quick-paypal-payment-styles.css'.
-Or change the options to use your theme stylesheet
+Edit the 'quick-paypal-payment-styles.css' or use the custom styles option.
+
+= Can I have more than one payment form on a page? =
+No. When you submit the form a function processes the payment info. If you have more than one form it won't know which one to process. I am working on this options but it's proving to be a bit dificult.
 
 = It's all gone wrong! =
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
 
 == Changelog ==
+
+= 1.2 =
+*	Added custom styles option
 
 = 1.1 =
 *	Added choice of plugin or theme styles
