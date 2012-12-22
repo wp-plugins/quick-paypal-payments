@@ -58,6 +58,9 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 1.3 =
+*	Simplified the processing code
+
 = 1.2 =
 *	Added custom styles option
 

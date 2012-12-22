@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 1.2
+Version: 1.3
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -167,6 +167,7 @@ function qpp_payment($atts)
 	ob_start();
 	extract(shortcode_atts(array( 'amount' => '' , 'id' => '' ), $atts));
 	$qpp = qpp_get_stored_options();
+	$content = '';
 	$payment_id = $qpp['inputreference'];
 	$payment_amount = $qpp['inputamount'];
 	if(isset( $_POST['PaymentSubmit']))
@@ -188,6 +189,7 @@ function qpp_payment($atts)
 			$errors	= '<p class="error">Please check the details you entered.</p>';
 			}
 		}
+	else {
 	if (!empty($qpp['title'])) $qpp['title'] = '<h2>' . $qpp['title'] . '</h2>';
 	if (!empty($qpp['blurb'])) $qpp['blurb'] = '<p>' . $qpp['blurb'] . '</p>';
 	$content ='
@@ -216,6 +218,7 @@ function qpp_payment($atts)
 		$content .= '<p><input type="submit" value="' . $caption . '" id="submit" name="PaymentSubmit" /></p>
 		</form>
 		</div>';
+	}
 	echo $content;	
 	$output_string=ob_get_contents();
 	ob_end_clean();
@@ -229,29 +232,22 @@ function paypal_process()
 	if (empty ($qpp['thanksurl'])) $qpp['thanksurl'] = $page_url;
 	if (empty ($qpp['cancelurl'])) $qpp['cancelurl'] = $page_url;
 	if ($qpp['target'] == 'newpage') $target = ' target="_blank" ';
-	?>
-	<script language="JavaScript" type="text/javascript">
-	function SubmitForm()
-		{
-		document.getElementById("frmCart").submit();
-		}
-	</script>
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="frmCart" id="frmCart" <?php echo $target; ?>>
+	$content = '<h2>Waiting for Paypal...</h2>
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="frmCart" id="frmCart" ' . $target . '>
 	<input type="hidden" name="cmd" value="_xclick">
-	<input type="hidden" name="business" value="<?php echo $qpp['email']; ?>">
-	<input type="hidden" name="return" value="<?php echo $qpp['thanksurl']; ?>">
-	<input type="hidden" name="cancel_return" value="<?php echo $qpp['cancelurl']; ?>">
+	<input type="hidden" name="business" value="' . $qpp['email'] . '">
+	<input type="hidden" name="return" value="' .  $qpp['thanksurl'] . '">
+	<input type="hidden" name="cancel_return" value="' .  $qpp['cancelurl'] . '">
 	<input type="hidden" name="no_shipping" value="1">
-	<input type="hidden" name="currency_code" value="<?php echo $qpp['currency']; ?>">
+	<input type="hidden" name="currency_code" value="' .  $qpp['currency'] . '">
 	<input type="hidden" name="item_number" value="">
-	<input type="hidden" name="item_name" value="<?php echo $qpp['inputreference'] . ': ' . $_SESSION['payment_id']; ?>">
-	<input type="hidden" name="amount" value="<?=$_SESSION['payment_amount']?>">
+	<input type="hidden" name="item_name" value="' .  $qpp['inputreference'] . ': ' . $_SESSION['payment_id'] . '">
+	<input type="hidden" name="amount" value="' . $_SESSION['payment_amount'] . '">
 	</form>
-	<div id="load"><h2>Waiting for Paypal...</h2></div>
 	<script language="JavaScript">
-	SubmitForm();
-	</script>
-	<?php
+	document.getElementById("frmCart").submit();
+	</script>';
+	echo $content;
 	}
 
 function current_page_url() {
