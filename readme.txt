@@ -24,7 +24,10 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 [quick paypal payments plugin](http://quick-plugins.com/quick-paypal-payments/).
 
 == Screenshots ==
-Coming soon...
+1. This is an example of a simple form usinf the shortcode [qpp].
+2. Form using shortcode [qpp id='room deposit' amount='£30'].
+3. Form using shortcode [qpp amount='$40'].
+4. Form using shortcode [qpp id='cleaning'].
 
 == Installation ==
 
@@ -57,6 +60,9 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 
 == Changelog ==
+
+= 1.4 =
+*	Now with width options
 
 = 1.3 =
 *	Simplified the processing code

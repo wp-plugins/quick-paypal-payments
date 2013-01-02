@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 1.3
+Version: 1.4
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -72,11 +72,14 @@ function qpp_settings()
 		$qpp['target'] = $_POST['qpp_target'];
 		$qpp['styles'] = $_POST['qpp_styles'];
 		$qpp['custom'] = $_POST['qpp_custom'];
+		$qpp['width'] = $_POST['width'];
+		$qpp['widthtype'] = $_POST['widthtype'];
 		update_option( 'qpp_options', $qpp);
 		qpp_admin_notice("The plugin settings have been updated.");
 		}
 	$$qpp['target'] = 'checked';
 	$$qpp['styles'] = 'checked';
+	$$qpp['widthtype'] = 'checked';
 	$content = '
 	<div id="qpp-options"> 
 	<div id="qpp-style">
@@ -111,6 +114,13 @@ function qpp_settings()
 	<h3>URL of thank you page</h3>
 	<input type="text" style="width:90%" name="qpp_thanksurl" value="' . $qpp['thanksurl'] . '" />
 	<h2>Styles</h2>
+	<h3>Form Width</h3>
+	<p>
+	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="widthtype" value="percent" ' . $percent . ' /> 100% (fill the available space)<br />
+	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="widthtype" value="pixel" ' . $pixel . ' /> Pixel (fixed)</p>
+	<p>Enter the width of the form in pixels. Just enter the value, no need to add &#146;px&#146;. The current width is as you see it here.</p>
+	<p><input type="text" style="width:4em" label="width" name="width" value="' . $qpp['width'] . '" /> px</p>
+	<h3>Style source</h3>
 	<p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="plugin" ' . $plugin . ' /> Use plugin styles<br>
 	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="theme" ' . $theme . ' /> Use theme styles<br>
 	<input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="qpp_styles" value="custom" ' . $custom . ' /> Use custom styles (add to text editor below)</p>
@@ -127,13 +137,13 @@ function qpp_settings()
 	<div id="qpp-style">
 	<h2>Shortcode Examples</h2>
 	<p><strong>[qpp]</strong></p>
-	<p><img src="' . plugins_url('/payment1.gif' , __FILE__ ) . '"></p>
+	<p><img src="' . plugins_url('/screenshot-1.gif' , __FILE__ ) . '"></p>
 	<p><strong>[qpp id=\'room deposit\' amount=\'&pound;30\']</strong></p>
-	<p><img src="' . plugins_url('/payment2.gif' , __FILE__ ) . '"></p>
+	<p><img src="' . plugins_url('/screenshot-2.gif' , __FILE__ ) . '"></p>
 	<p><strong>[qpp amount=\'$40\']</strong></p>
-	<p><img src="' . plugins_url('/payment3.gif' , __FILE__ ) . '"></p>
+	<p><img src="' . plugins_url('/screenshot-3.gif' , __FILE__ ) . '"></p>
 	<p><strong>[qpp id=\'cleaning\']</strong></p>
-	<p><img src="' . plugins_url('/payment4.gif' , __FILE__ ) . '"></p>
+	<p><img src="' . plugins_url('/screenshot-4.gif' , __FILE__ ) . '"></p>
 	</div></div>';
 	echo $content;
 	}
@@ -170,6 +180,13 @@ function qpp_payment($atts)
 	$content = '';
 	$payment_id = $qpp['inputreference'];
 	$payment_amount = $qpp['inputamount'];
+	if ($qpp['widthtype'] == 'pixel') {
+		$width = ' style="width: ' . preg_replace("/[^0-9]/", "", $qpp['width']) . 'px"';
+		}
+	else {
+		$width = ' style="width: 100%;"';
+		$submit = ' style="width: calc(100% - 14px);"';
+		}
 	if(isset( $_POST['PaymentSubmit']))
 		{
 		$errors = '';
@@ -193,7 +210,7 @@ function qpp_payment($atts)
 	if (!empty($qpp['title'])) $qpp['title'] = '<h2>' . $qpp['title'] . '</h2>';
 	if (!empty($qpp['blurb'])) $qpp['blurb'] = '<p>' . $qpp['blurb'] . '</p>';
 	$content ='
-	<div id="qpp-style">' . $qpp['title'] . $qpp['blurb'] .
+	<div id="qpp-style" ' . $width . '>' . $qpp['title'] . $qpp['blurb'] .
 		'<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
 		$content .= $errors;
 		if (empty($id)&& empty($amount)) {
@@ -294,5 +311,7 @@ function qpp_get_default_options () {
 	$qpp['target'] = 'current';
 	$qpp['styles'] = 'plugin';
 	$qpp['custom'] = "#qpp-style {\r\n\r\n}";
+	$qpp['width'] = '280';
+	$qpp['widthtype'] = 'pixel';
 	return $qpp;
 	}
