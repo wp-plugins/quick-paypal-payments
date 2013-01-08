@@ -61,6 +61,10 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+
+= 1.5 =
+*	Error checking went wonky. It's fixed now
+
 = 1.4 =
 *	Now with width options
 
