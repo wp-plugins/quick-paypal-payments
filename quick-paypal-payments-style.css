@@ -10,6 +10,47 @@
 	padding: 0;
 	}
 
+
+#qpp-style #none {
+	border: 0px solid #FFF;
+	padding: 0;
+	}
+
+#qpp-style #plain {
+	border: 1px solid #415063;
+	padding: 10px;
+	margin: 0;
+	}
+
+#qpp-style #rounded {
+	border: 1px solid #415063;
+	padding: 10px;
+	-moz-border-radius: 10px;
+	-webkit-box-shadow: 10px;
+	border-radius: 10px;
+	}
+
+#qpp-style #shadow {
+	border: 1px solid #415063;
+	padding: 10px;
+	margin: 0 10px 20px 0;
+	-webkit-box-shadow: 5px 5px 5px #415063;
+	-moz-box-shadow: 5px 5px 5px #415063;
+	box-shadow: 5px 5px 5px #415063;
+	}
+
+#qpp-style #roundshadow {
+	border: 1px solid #415063;
+	padding: 10px; 
+	margin: 0 10px 20px 0; 
+	-webkit-box-shadow: 5px 5px 5px #415063;
+	-moz-box-shadow: 5px 5px 5px #415063;
+	box-shadow: 5px 5px 5px #415063;
+	-moz-border-radius: 10px; 
+	-webkit-box-shadow: 10px; 
+	border-radius: 10px;
+	}
+
 #qpp-style input {
 	font-family: arial, sans-serif;
 	margin: 5px 0 0 0;

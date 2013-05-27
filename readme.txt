@@ -1,9 +1,9 @@
 === Quick Paypal Payments ===
 
 Contributors: 
-Tags: contact form
+Tags: paypal payment form
 Requires at least: 2.7
-Tested up to: 3.4.2
+Tested up to: 3.5.1
 Stable tag: trunk
 
 Zero to PayPal with just one shortcode
@@ -17,6 +17,8 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 *	Accepts any currency
 *	Fixed or variable payment amounts
 *	Easy to use shortcode
+*	Fully editable
+*	Styling options
 *	Multi-language
 
 = Developers plugin page =
@@ -24,22 +26,19 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 [quick paypal payments plugin](http://quick-plugins.com/quick-paypal-payments/).
 
 == Screenshots ==
-1. This is an example of a simple form usinf the shortcode [qpp].
-2. Form using shortcode [qpp id='room deposit' amount='£30'].
-3. Form using shortcode [qpp amount='$40'].
-4. Form using shortcode [qpp id='cleaning'].
+1. This is the main admin screen.
+2. An example form.
 
 == Installation ==
 
-1.	Download the plugin.
-2.	Login to your wordpress dashboard.
-3.	Go to 'Plugins', 'Add New' then 'Upload'.
-4.	Browse to the downloaded plugin then then 'Install Now'.
-5.	Activate the plugin.
-6.	Go to the plugin 'Settings' page to add you paypal email address and currency
-7.	Edit any of the form settings if you wish.
-8.	Use the shortcode `[qpp]` in you posts or page or even your sidebar.
-10.	To use the form in your theme files use the code `<?php echo do_shortcode('[qpp]'); ?>`.
+1.	Login to your wordpress dashboard.
+2.	Go to 'Plugins', 'Add New' then search for 'Quick Paypal Payments'.
+3.	Follow the on screen instructions.
+4.	Activate the plugin.
+5.	Go to the plugin 'Settings' page to add you paypal email address and currency
+6.	Edit any of the form settings if you wish.
+7.	Use the shortcode `[qpp]` in you posts or page or even your sidebar.
+8.	To use the form in your theme files use the code `<?php echo do_shortcode('[qpp]'); ?>`.
 
 == Frequently Asked Questions ==
 
@@ -58,9 +57,13 @@ No. When you submit the form a function processes the payment info. If you have 
 = It's all gone wrong! =
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
-
 == Changelog ==
 
+= 2.0 =
+*	Major upgrade to the admin pages
+*	Added loads of styling options
+*	Custom error messages and improved validation
+*	Faster paypal processing
 
 = 1.5 =
 *	Error checking went wonky. It's fixed now
