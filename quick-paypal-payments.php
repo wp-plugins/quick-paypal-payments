@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 2.0
+Version: 2.0.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -106,7 +106,7 @@ function qpp_process_form($values) {
 	<input type="hidden" name="return" value="' .  $send['thanksurl'] . '">
 	<input type="hidden" name="cancel_return" value="' .  $send['cancelurl'] . '">
 	<input type="hidden" name="no_shipping" value="1">
-	<input type="hidden" name="currency_code" value="' .  $qpp_seup['currency'] . '">
+	<input type="hidden" name="currency_code" value="' .  $qpp_setup['currency'] . '">
 	<input type="hidden" name="item_number" value="">
 	<input type="hidden" name="item_name" value="' .  $qpp['inputreference'] . ': ' . $values['reference'] . '">
 	<input type="hidden" name="amount" value="' . $check . '">
