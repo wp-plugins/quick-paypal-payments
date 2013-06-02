@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 2.0.1
+Version: 2.0.2
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -56,7 +56,7 @@ class qpp_payment_widget extends WP_Widget {
  	   	extract($args, EXTR_SKIP);
 		$id=$instance['id'];
 		$amount=$instance['amount'];
-		echo qpp_payment($instance);
+		echo qpp_loop($instance);
 		}
 	}
 

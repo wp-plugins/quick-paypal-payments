@@ -59,6 +59,9 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 2.0.2 =
+*	Bug fix: error in sidebar widget
+
 = 2.0.1 =
 *	Bug fix: selected currency asn't being passed to paypal
 
