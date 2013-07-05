@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 2.0.2
+Version: 2.0.3
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -137,8 +137,10 @@ function qpp_loop($atts) {
 	else {$values['amount'] = $qpp['inputamount'];$values['pay'] = '';}
 	if (isset($_POST['PaymentSubmit'])) {
 		$formvalues = $_POST;
-		if (qpp_verify_form($formvalues)) qpp_display_form($formvalues,$errors);
-    	else {
+		if (!$amount && !$id) {
+			if (qpp_verify_form($formvalues)) qpp_display_form($formvalues,$errors);
+    		}
+		else {
 			if ($amount) $formvalues['amount'] = $amount;
 			if ($if) $formvalues['reference'] = $id;
 			qpp_process_form($formvalues);
@@ -153,15 +155,16 @@ function qpp_loop($atts) {
 function qpp_use_custom_css () {
 	$style = qpp_get_stored_style();
 	if ($style['font'] == 'plugin') {
-			$font = "font-family: ".$style['font-family']."; font-size: ".$style['font-size']."; ";
-			$input = "#qpp-style input[type=text], #qpp-style submit {".$font."}\r\n";
+			$font = "font-family: ".$style['font-family']."; font-size: ".$style['font-size'].";color: ".$style['font-colour'].";";			
 			}
+	$input = "#qpp-style input[type=text] {border: ".$style['input-border'].";".$font."}\r\n";
+	
 	if ($style['background'] == 'white') $background = "#qpp-style div {background:#FFF;}\r\n";
 	if ($style['background'] == 'color') $background = "#qpp-style div {background:".$style['backgroundhex'].";}\r\n";
 	if ($style['widthtype'] == 'pixel') $width = preg_replace("/[^0-9]/", "", $style['width']) . 'px';
 	else $width = '100%';
 	if ($style['corners'] == 'round') $corner = '5px'; else $corner = '0';
-	$corners = "#qpp-style input[type=text], #qpp-style .submit {border-radius:".$corner.";}\r\n";
+	$corners = "#qpp-style input[type=text], #qpp-style #submit {border-radius:".$corner.";}\r\n";
 	if ($style['corners'] == 'theme') $corners = '';
 	$code .= "<style type=\"text/css\" media=\"screen\">\r\n#qpp-style {width:".$width.";}\r\n".$corners.$input.$background;
 	if ($style['styles'] == 'checked') $code .= $style['custom'] . "\r\n";
@@ -248,9 +251,13 @@ function qpp_get_default_style() {
 	$style['font'] = 'plugin';
 	$style['font-family'] = 'arial, sans-serif';
 	$style['font-size'] = '1.2em';
+	$style['font-colour'] = '#465069';
 	$style['width'] = 280;
 	$style['widthtype'] = 'pixel';
-	$style['border'] = 'none';
+	$style['border'] = 'plain';
+	$style['input-border'] = '1px solid #415063';
+	$style['input-required'] = '1px solid #00C618';
+	$style['bordercolour'] = '#415063';
 	$style['background'] = 'white';
 	$style['backgroundhex'] = '#FFF';
 	$style['corners'] = 'corner';
