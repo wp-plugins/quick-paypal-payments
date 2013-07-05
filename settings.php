@@ -127,7 +127,7 @@ function qpp_form_options() {
 
 function qpp_send_options() {
 	if( isset( $_POST['Submit'])) {
-		$options = array('waiting','cancelurl,','thanksurl','target');
+		$options = array('waiting','cancelurl','thanksurl','target');
 		foreach ($options as $item) $send[$item] = stripslashes( $_POST[$item]);
 		update_option('qpp_send', $send);
 		qpp_admin_notice("The submission settings have been updated.");
@@ -167,7 +167,7 @@ function qpp_send_options() {
 
 function qpp_styles() {
 	if( isset( $_POST['Submit'])) {
-		$options = array( 'font','font-family','font-size','border','width','widthtype','background','backgroundhex','corners','styles','use_custom','custom');
+		$options = array( 'font','font-family','font-size','font-colour','input-border','input-required','border','width','widthtype','background','backgroundhex','corners','use_custom','styles','usetheme');
 		foreach ( $options as $item) $style[$item] = stripslashes($_POST[$item]);
 		update_option( 'qpp_style', $style);
 		qpp_admin_notice("The form styles have been updated.");
@@ -200,6 +200,7 @@ function qpp_styles() {
 	</p>
 	<p>Font Family: <input type="text" style="width:15em" label="font-family" name="font-family" value="' . $style['font-family'] . '" /></p>
 	<p>Font Size: <input type="text" style="width:6em" label="font-size" name="font-size" value="' . $style['font-size'] . '" /></p>
+	<p>Font Colour: <input type="text" style="width:15em" label="font-colour" name="font-colour" value="' . $style['font-colour'] . '" /></p>
 	<h2>Form Border</h2>
 	<p>Note: The rounded corners and shadows only work on CSS3 supported browsers and even then not in IE8. Don\'t blame me, blame Microsoft.</p>
 	<p>
@@ -214,7 +215,10 @@ function qpp_styles() {
 		<input style="margin:0; padding:0; border:none;" type="radio" name="background" value="theme" ' . $theme . ' /> Use theme colours<br />
 		<input style="margin:0; padding:0; border:none;" type="radio" name="background" value="color" ' . $color . ' /> Set your own (enter HEX code or color name below)</p>
 	<p><input type="text" style="width:7em" label="background" name="backgroundhex" value="' . $style['backgroundhex'] . '" /></p>
-	<h2>Input field corners</h2>
+	<h2>Input fields</h2>
+	<h3>Borders</h3>
+	<p>Style: <input type="text" style="width:15em" label="input-border" name="input-border" value="' . $style['input-border'] . '" /></p>
+		<h3>Corners</h3>
 	<p>
 		<input style="margin:0; padding:0; border:none;" type="radio" name="corners" value="corner" ' . $corner . ' /> Use theme settings<br />
 		<input style="margin:0; padding:0; border:none;" type="radio" name="corners" value="square" ' . $square . ' /> Square corners<br />
@@ -251,7 +255,7 @@ function qpp_error_page() {
 	$content .='<form method="post" action="">
 		<p>Error header (leave blank if you don\'t want a heading):</p>
 		<p><input type="text"  style="width:100%" name="errortitle" value="' . $error['errortitle'] . '" /></p>
-		<p>This is the blurb that will appear below the error heading and above the actual error messages (leave blank if you don\'t want any blurb):</p>
+		<p>This is the blurb that will appear below the error heading and above the form (leave blank if you don\'t want any blurb):</p>
 		<p><input type="text" style="width:100%" name="errorblurb" value="' . $error['errorblurb'] . '" /></p>
 		<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the error message?\' );"/></p>
 		</form>
@@ -273,7 +277,7 @@ function qpp_help() {
 		<p>To change the width of the form, border style and background colour use the <a href="?page=quick-paypal-payments/settings.php&tab=styles">styling</a> page. You also have the option to add some custom CSS.</p>
 		<p>You can create your own <a href= "?page=quick-paypal-payments/settings.php&tab=error">error messages</a> as well.</p>
 		<p>If it all goes a bit pear shaped you can reset everything to the defaults.</p>
-		<p>There is some development info on <a href="http://quick-plugins.com/quick-paypal-payments/" target="_blank">my plugin page</a> along with a feedback form. Or you can email me at <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>
+		<p>There is some more info on <a href="http://quick-plugins.com/quick-event-manager/" target="_blank">the plugin page</a> along with a feedback form. Or you can email me at <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>
 		</div>
 		<div class="qpp-options"> 
 		<h2 style="color:#B52C00">Shortcode Options</h2>

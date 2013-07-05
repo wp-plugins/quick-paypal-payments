@@ -137,9 +137,9 @@ function qpp_loop($atts) {
 	else {$values['amount'] = $qpp['inputamount'];$values['pay'] = '';}
 	if (isset($_POST['PaymentSubmit'])) {
 		$formvalues = $_POST;
-		if (!$amount && !$id) {
+		
 			if (qpp_verify_form($formvalues)) qpp_display_form($formvalues,$errors);
-    		}
+    
 		else {
 			if ($amount) $formvalues['amount'] = $amount;
 			if ($if) $formvalues['reference'] = $id;
