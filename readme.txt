@@ -59,6 +59,10 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 2.0.4 =
+*	Bug fix: fixed duplicate function name error
+
+
 = 2.0.2 =
 *	Bug fix: error in sidebar widget
 

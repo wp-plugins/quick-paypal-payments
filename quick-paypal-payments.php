@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 2.0.3
+Version: 2.0.4
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -95,7 +95,7 @@ function qpp_process_form($values) {
 	$qpp = qpp_get_stored_options();
 	$qpp_setup = qpp_get_stored_setup();
 	$send = qpp_get_stored_send();
-	$page_url = current_page_url();
+	$page_url = qpp_current_page_url();
 	if (empty($send['thanksurl'])) $send['thanksurl'] = $page_url;
 	if (empty($send['cancelurl'])) $send['cancelurl'] = $page_url;
 	if ($send['target'] == 'newpage') $target = ' target="_blank" ';
@@ -117,7 +117,7 @@ function qpp_process_form($values) {
 	echo $content;
 	}
 
-function current_page_url() {
+function qpp_current_page_url() {
 	$pageURL = 'http';
 	if( isset($_SERVER["HTTPS"]) ) { if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";} }
 	$pageURL .= "://";
@@ -137,10 +137,8 @@ function qpp_loop($atts) {
 	else {$values['amount'] = $qpp['inputamount'];$values['pay'] = '';}
 	if (isset($_POST['PaymentSubmit'])) {
 		$formvalues = $_POST;
-		
-			if (qpp_verify_form($formvalues)) qpp_display_form($formvalues,$errors);
-    
-		else {
+		if (qpp_verify_form($formvalues)) qpp_display_form($formvalues,$errors);
+   		else {
 			if ($amount) $formvalues['amount'] = $amount;
 			if ($if) $formvalues['reference'] = $id;
 			qpp_process_form($formvalues);
