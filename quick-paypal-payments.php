@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-Version: 2.1
+ersion: 2.1.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -59,7 +59,6 @@ class qpp_payment_widget extends WP_Widget {
 		echo qpp_loop($instance);
 		}
 	}
-
 function qpp_display_form($values,$error) {
 	$qpp = qpp_get_stored_options();
 	$style = qpp_get_stored_style();
@@ -71,9 +70,16 @@ function qpp_display_form($values,$error) {
 		$content .= "<h2>" . $error['errortitle'] . "</h2>\r\t<p class='error'>" . $error['errorblurb'] . "</p>\r\t";
 	else
 		$content .= $qpp['title'] . "\r\t" . $qpp['blurb'] . "\r\t";
-		$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
+	$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
 	if (empty($values['id'])) $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="clickclear(this, \'' . $values['reference'] . '\')" onblur="clickrecall(this, \'' . $values['reference'] . '\')"/></p>';
-	else $content .= '<p class="payment" >' . $values['reference'] . '</p>';
+	else {
+		if ($values['explode']) {
+			$checked = 'checked';$ref = explode(",",$values['reference']);
+			$content .= '<p class="payment" >'.$qpp['shortcodereference'].'<br>';
+			foreach ($ref as $item) { $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="reference" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';$checked='';}
+			$content .= '</p>';}
+		else $content .= '<p class="payment" >'.$values['reference'].'</p>';
+		}
 	if (empty($values['pay'])) $content .= '<p><input type="text" label="Amount" name="amount" value="' . $values['amount'] . '" onfocus="clickclear(this, \'' . $values['amount'] . '\')" onblur="clickrecall(this, \'' . $values['amount'] . '\')"/></p>';
 	else $content .= '<p class="payment" >' . $values['amount'] . '</p>';	
 	$caption = $qpp['submitcaption'];
@@ -91,7 +97,6 @@ function qpp_verify_form ($formvalues,$values) {
 		if (!$values['pay']) if ($formvalues['reference'] == $qpp['inputreference'] || empty($formvalues['reference'])) $errors	= 'error';
 		return $errors;
 		}
-
 function qpp_process_form($values) {
 	$qpp = qpp_get_stored_options();
 	$qpp_setup = qpp_get_stored_setup();
@@ -117,7 +122,6 @@ function qpp_process_form($values) {
 	</script>';
 	echo $content;
 	}
-
 function qpp_current_page_url() {
 	$pageURL = 'http';
 	if( isset($_SERVER["HTTPS"]) ) { if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";} }
@@ -126,18 +130,21 @@ function qpp_current_page_url() {
 	else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 	return $pageURL;
 	}
-
 function qpp_loop($atts) {
 	ob_start();
 	extract(shortcode_atts(array( 'amount' => '' , 'id' => '' ), $atts));
 	$qpp = qpp_get_stored_options();
 	$errors = qpp_get_stored_error();
-	if ($id) {$formvalues['reference'] = $qpp['shortcodereference'].' '.$id;$formvalues['id'] = 'checked';}
+	if ($id) {
+		$formvalues['id'] = 'checked';
+		if (strrpos($id,',')) {$formvalues['reference'] = $id;$formvalues['explode'] = 'checked';}
+		else $formvalues['reference'] = $qpp['shortcodereference'].' '.$id;
+		}
 	else {$formvalues['reference'] = $qpp['inputreference'];$formvalues['id'] = '';}
 	if ($amount) {$formvalues['amount'] = $qpp['shortcodeamount'].' '.$amount;$formvalues['pay'] = 'checked';}
 	else {$formvalues['amount'] = $qpp['inputamount'];$formvalues['pay'] = '';}
 	if (isset($_POST['PaymentSubmit']) || isset($_POST['PaymentSubmit_x'])) {
-		if (isset($_POST['reference'])) $formvalues['reference'] = $_POST['reference'];
+		if (isset($_POST['reference'])) {$formvalues['reference'] = $_POST['reference'];$id = $_POST['reference'];}
 		if (isset($_POST['amount'])) $formvalues['amount'] = $_POST['amount'];
 		if (qpp_verify_form($formvalues,$values)) qpp_display_form($formvalues,$errors);
    		else {
@@ -151,7 +158,6 @@ function qpp_loop($atts) {
 	ob_end_clean();
 	return $output_string;
 	}
-
 function qpp_use_custom_css () {
 	$style = qpp_get_stored_style();
 	if ($style['font'] == 'plugin') {
@@ -168,7 +174,7 @@ function qpp_use_custom_css () {
 	$submit = "#qpp-style #submit{color:".$style['submit-colour'].";background:".$style['submit-background'].";}\r\n";
 	if ($style['corners'] == 'theme') $corners = '';
 	$code .= "<style type=\"text/css\" media=\"screen\">\r\n#qpp-style {width:".$width.";}\r\n".$corners.$input.$background.$submit;
-	if ($style['styles'] == 'checked') $code .= $style['custom'] . "\r\n";
+	if ($style['use_custom'] == 'checked') $code .= $style['custom'] . "\r\n";
 	$code .= "</style>\r\n";
 	echo $code;
 	}
@@ -266,6 +272,7 @@ function qpp_get_default_style() {
 	$style['submit-background'] = '#343838';
 	$style['submit-button'] = '';
 	$style['styles'] = 'plugin';
+	$style['use_custom'] = '';
 	$style['custom'] = "#qpp-style {\r\n\r\n}";
 	return $style;
 	}

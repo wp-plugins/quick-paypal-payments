@@ -18,7 +18,7 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 *	Fixed or variable payment amounts
 *	Easy to use shortcode
 *	Fully editable
-*	Styling options
+*	Loads of styling options
 *	Multi-language
 
 = Developers plugin page =
@@ -58,6 +58,9 @@ No. When you submit the form a function processes the payment info. If you have 
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
 == Changelog ==
+
+= 2.1.1 =
+*	Bug fix: Custom CSS option wasn't saving properly
 
 = 2.1 =
 *	Added styling options for Submit button

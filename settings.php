@@ -72,7 +72,7 @@ function qpp_setup () {
 	<div class="qpp-options">
 	<h2 style="color:#B52C00">Using the Plugin</h2>
 	<p>To add the paypal payment to your posts and pages use the shortcode <code>[qpp]</code>.</p>
-	<p>To add a payment form to a sidebar use the <a href="' . get_admin_url() . '/wp-admin/widgets.php">widget manager</a>.</p>
+	<p>To add a payment form to a sidebar use the <a href="' . get_admin_url() . 'widgets.php">widget manager</a>.</p>
 	<p>The sortcode supports two parameters: <em>id</em> and <em>amount</em>. For a full explantion on how these work see the <a href= "?page=quick-paypal-payments/settings.php&tab=help">help</a> page.</p>
 	<p>You can only have one payment form per page. I&#146;ve tried to get multiple forms to work but failed miserably. Hopefully in the future I&#146;ll get it to work properly.</p>
 	</div>';
@@ -167,7 +167,7 @@ function qpp_send_options() {
 
 function qpp_styles() {
 	if( isset( $_POST['Submit'])) {
-		$options = array( 'font','font-family','font-size','font-colour','input-border','input-required','border','width','widthtype','background','backgroundhex','corners','use_custom','styles','usetheme');
+		$options = array( 'font','font-family','font-size','font-colour','input-border','input-required','border','width','widthtype','background','backgroundhex','corners','custom','use_custom','usetheme','styles','submit-colour','submit-background','submit-button');
 		foreach ( $options as $item) $style[$item] = stripslashes($_POST[$item]);
 		update_option( 'qpp_style', $style);
 		qpp_admin_notice("The form styles have been updated.");
@@ -224,10 +224,14 @@ function qpp_styles() {
 		<input style="margin:0; padding:0; border:none;" type="radio" name="corners" value="square" ' . $square . ' /> Square corners<br />
 		<input style="margin:0; padding:0; border:none;" type="radio" name="corners" value="round" ' . $round . ' /> 5px rounded corners
 	</p>
-	<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /></p>
+	<h2>Submit Button</h2>
+	<p>Font Colour: <input type="text" style="width:15em" label="submit-colour" name="submit-colour" value="' . $style['submit-colour'] . '" /></p>
+	<p>Background: <input type="text" style="width:15em" label="submit-background" name="submit-background" value="' . $style['submit-background'] . '" /></p>
+	<p>Button Image: <input type="text" style="width:25em" label="submit-button" name="submit-button" value="' . $style['submit-button'] . '" /><br>
+Leave blank if you don\'t want to use an image</p>
 	<h2>Custom CSS</h2>
-	<p><input type="checkbox" style="margin:0; padding: 0; border: none" name="custom"' . $style['use_custom'] . ' value="checked" /> Use Custom CSS</p>
-	<p><textarea style="width:100%; height: 200px" name="styles">' . $style['custom'] . '</textarea></p>
+	<p><input type="checkbox" style="margin:0; padding: 0; border: none" name="use_custom" ' . $style['use_custom'] . ' value="checked" /> Use Custom CSS</p>
+	<p><textarea style="width:100%; height: 200px" name="custom">' . $style['custom'] . '</textarea></p>
 	<p>To see all the styling use the <a href="'.get_admin_url().'plugin-editor.php?file=quick-contact-form/quick-contact-form-style.css">CSS editor</a>.</p>
 	<p>The main style wrapper is the <code>#qpp-style</code> id.</p>
 	<p>The form borders are: #none, #plain, #rounded, #shadow, #roundshadow.</p>
@@ -277,7 +281,7 @@ function qpp_help() {
 		<p>To change the width of the form, border style and background colour use the <a href="?page=quick-paypal-payments/settings.php&tab=styles">styling</a> page. You also have the option to add some custom CSS.</p>
 		<p>You can create your own <a href= "?page=quick-paypal-payments/settings.php&tab=error">error messages</a> as well.</p>
 		<p>If it all goes a bit pear shaped you can reset everything to the defaults.</p>
-		<p>There is some more info on <a href="http://quick-plugins.com/quick-event-manager/" target="_blank">the plugin page</a> along with a feedback form. Or you can email me at <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>
+		<p>There is some more info on <a href="http://quick-plugins.com/quick-paypal-payments/" target="_blank">the plugin page</a> along with a feedback form. Or you can email me at <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>
 		</div>
 		<div class="qpp-options"> 
 		<h2 style="color:#B52C00">Shortcode Options</h2>
