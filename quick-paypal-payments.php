@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal 
-ersion: 2.1.1
+Version: 2.1.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
