@@ -16,10 +16,12 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 
 *	Accepts any currency
 *	Fixed or variable payment amounts
-*	Easy to use shortcode
+*	Easy to use range of shortcode options
 *	Fully editable
 *	Loads of styling options
 *	Multi-language
+*	Add custom forms anywhere on your site
+*	Downloadable payment records
 
 = Developers plugin page =
 
@@ -35,9 +37,9 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 2.	Go to 'Plugins', 'Add New' then search for 'Quick Paypal Payments'.
 3.	Follow the on screen instructions.
 4.	Activate the plugin.
-5.	Go to the plugin 'Settings' page to add you paypal email address and currency
+5.	Go to the plugin 'Settings' page to add your paypal email address and currency
 6.	Edit any of the form settings if you wish.
-7.	Use the shortcode `[qpp]` in you posts or page or even your sidebar.
+7.	Use the shortcode `[qpp]` in your posts or page or even your sidebar.
 8.	To use the form in your theme files use the code `<?php echo do_shortcode('[qpp]'); ?>`.
 
 == Frequently Asked Questions ==
@@ -49,15 +51,20 @@ Go to your plugin list and scroll down until you see 'Quick Paypal Payments' and
 [qpp]
 
 = How do I change the colours? =
-Edit the 'quick-paypal-payment-styles.css' or use the custom styles option.
+Edit the 'quick-paypal-payment.css' or use the custom styles option.
 
 = Can I have more than one payment form on a page? =
-No. When you submit the form a function processes the payment info. If you have more than one form it won't know which one to process. I am working on this options but it's proving to be a bit dificult.
+Yes. But they have to have different names. Create the forms on the setup page.
 
 = It's all gone wrong! =
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
 == Changelog ==
+
+= 3.0
+*	Multiple form support
+*	Dashboard link to display and download payment records
+*	Add options to your forms using shortcodes
 
 = 2.1.1 =
 *	Bug fix: Custom CSS option wasn't saving properly

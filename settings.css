@@ -41,7 +41,6 @@
 	float: left;
 	width: 46%;
 	}
-
 .qpp-options p {
 	margin: 4px 0;
 	padding: 0;
@@ -51,40 +50,42 @@
 	display:block;
 	font-weight:bold;
 	}
-
 .qpp-options h2 {
 	color: #005F6B;
 	}
-
 .qpp-options h3 {
 	color: #717DD7;
 	margin: 4px 0 0 0;
 	padding: 0;
 	}
-
 .qpp-options submit input:focus {
 	color: #FFF;
 	}
-
 .qpp-options ul {
 	margin: 0;
 	padding: 0;
 	}
-
 .qpp-style td, #qpp-widget td {
 	border-top: 1px solid #005F6B;
 	padding: 5px 10px 5px 0;
 	max-width: 400px;
 	vertical-align:top;
 	}
-
 .qpp-style td b, #qpp-widget td b {
 	color: #005F6B;
 	}
-
-.qpp-style th, #qpp-widget th {
+#qpp-widget th {
 	padding: 5px 10px 5px 0;
 	max-width: 400px;
 	text-align: left;
 	color: #005F6B;
+	}
+#qpp-widget .submit {
+	margin: 0px 0 7px 0;
+	padding: 4px;
+	border:1px solid #415063;
+	color: #FFF;
+	background: #343838;
+	text-align: center;
+	cursor: pointer;
 	}
