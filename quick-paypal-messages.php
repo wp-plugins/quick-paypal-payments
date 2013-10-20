@@ -57,7 +57,7 @@ function qpp_show_messages($id) {
 	foreach(array_reverse( $message ) as $value) {
 		if ($count < $showthismany ) {
 			if ($value['date']) $report = 'messages';
-			$content .= '<tr><td>'.$value['field0'].'</td><td>'.$value['field1'].'</td><td>'.$value['field2'].'</td><td>'.$value['field3'].'</td></tr>';
+			$content .= '<tr><td>'.strip_tags($value['field0']).'</td><td>'.strip_tags($value['field1']).'</td><td>'.strip_tags($value['field2']).'</td><td>'.strip_tags($value['field3']).'</td></tr>';
 			$count = $count+1;	}
 			}
 		}
@@ -65,7 +65,7 @@ function qpp_show_messages($id) {
 	foreach($message as $value) {
 		if ($count < $showthismany ) {
 			if ($value['date']) $report = 'messages';
-			$content .= '<tr><td>'.$value['field0'].'</td><td>'.$value['field1'].'</td><td>'.$value['field2'].'</td><td>'.$value['field3'].'</td></tr>';
+			$content .= '<tr><td>'.strip_tags($value['field0']).'</td><td>'.strip_tags($value['field1']).'</td><td>'.strip_tags($value['field2']).'</td><td>'.strip_tags($value['field3']).'</td></tr>';
 			$count = $count+1;	}
 			}
 		}	

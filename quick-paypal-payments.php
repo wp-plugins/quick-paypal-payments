@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.0
+Version: 3.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -51,17 +51,17 @@ function qpp_display_form( $values, $errors, $id ) {
 	else
 		$content .= $qpp['title'] . "\r\t" . $qpp['blurb'] . "\r\t";
 	$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
-	if (empty($values['id'])) $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/></p>';
+	if (empty($values['id'])) {$values['reference'] = strip_tags($values['reference']); $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/></p>';}
 	else {
 		if ($values['explode']) {
-			$checked = 'checked';$ref = explode(",",$values['reference']);
+			$checked = 'checked';$ref = explode(",",strip_tags($values['reference']));
 			$content .= '<p class="payment" >'.$qpp['shortcodereference'].'<br>';
 			foreach ($ref as $item) { $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="reference" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';$checked='';}
 			$content .= '</p>';}
-		else $content .= '<p class="input" >'.$values['reference'].'</p>';
+		else $content .= '<p class="input" >'.strip_tags($values['reference']).'</p>';
 		}
-	if ($qpp['use_quantity']) $content .= '<p><span class="input">'.$qpp['quantitylabel'].'</span><input type="text" style="width:3em;margin-left:5px" label="quantity" name="quantity" value="' . $values['quantity'] . '" onfocus="qppclear(this, \'' . $values['quantity'] . '\')" onblur="qpprecall(this, \'' . $values['quantity'] . '\')"/></p>';
-	if (empty($values['pay'])) $content .= '<p><input type="text" label="Amount" name="amount" value="' . $values['amount'] . '" onfocus="qppclear(this, \'' . $values['amount'] . '\')" onblur="qpprecall(this, \'' . $values['amount'] . '\')"/></p>';
+	if ($qpp['use_quantity']) {$values['quantity'] = strip_tags($values['quantity']); $content .= '<p><span class="input">'.$qpp['quantitylabel'].'</span><input type="text" style="width:3em;margin-left:5px" label="quantity" name="quantity" value="' . $values['quantity'] . '" onfocus="qppclear(this, \'' . $values['quantity'] . '\')" onblur="qpprecall(this, \'' . $values['quantity'] . '\')"/></p>';}
+	if (empty($values['pay'])) {$values['amount'] = strip_tags($values['amount']); $content .= '<p><input type="text" label="Amount" name="amount" value="' . $values['amount'] . '" onfocus="qppclear(this, \'' . $values['amount'] . '\')" onblur="qpprecall(this, \'' . $values['amount'] . '\')"/></p>';}
 	else $content .= '<p class="input" >' . $values['amount'] . '</p>';	
 	$caption = $qpp['submitcaption'];
 	if ($style['submit-button']) $content .= '<p><input type="image" value="' . $caption . '" style="border:none;" src="'.$style['submit-button'].'" name="PaymentSubmit" /></p>';
@@ -95,8 +95,8 @@ function qpp_process_form($values,$id) {
 	<input type="hidden" name="no_shipping" value="1">
 	<input type="hidden" name="currency_code" value="' .  $currency[$id] . '">
 	<input type="hidden" name="item_number" value="">
-	<input type="hidden" name="quantity" value="' .  $values['quantity'] . '">
-	<input type="hidden" name="item_name" value="' .  $qpp['inputreference'] . ': ' . $values['reference'] . '">
+	<input type="hidden" name="quantity" value="' . strip_tags($values['quantity']) . '">
+	<input type="hidden" name="item_name" value="' .$qpp['inputreference'] . ': ' . strip_tags($values['reference']) . '">
 	<input type="hidden" name="amount" value="' . $check . '">
 	</form>
 	<script language="JavaScript">

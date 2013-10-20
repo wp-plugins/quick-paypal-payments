@@ -82,7 +82,7 @@ function qpp_setup ($id) {
 		if ($item == '') $formname = 'default'; else $formname = $item;
 		$content .='<tr><td><input style="margin:0; padding:0; border:none" type="radio" name="current" value="' .$item . '" ' .$checked . ' /> '.$formname.'</td>';
 		$content .='<td><input type="text" style="width:6em;padding:1px;" label="qpp_curr" name="qpp_curr'.$item.'" value="' . $qpp_curr[$item].'" /></td>';
-		if ($item) $shortcode = ' id="'.$item.'"'; else $shortcode='';
+		if ($item) $shortcode = ' form="'.$item.'"'; else $shortcode='';
 		$content .= '<td><code>[qpp'.$shortcode.']</code></td></tr>';
 		}
 	$content .= '</table><p>To delete or reset a form use the <a href="?page=quick-paypal-payments/settings.php&tab=reset">reset</a> tab.</p>
@@ -90,8 +90,9 @@ function qpp_setup ($id) {
 		<h2>Create New Form</h2>
 		<p>Enter form name (letters and numbers only - no spaces or punctuation marks)</p>
 		<p><input type="text" style="width:100%" label="new_Form" name="new_form" value="" /></p>
-		<p>Enter currency: <input type="text" style="width:6em" label="new_curr" name="new_curr" value="'.$new_curr.'" />(For example: GBP, USD, EUR)</p>
-		<p>Currency codes are given <a href="http://en.wikipedia.org/wiki/ISO_4217" target="blank">here</a>.</p>
+		<p>Enter currency code: <input type="text" style="width:6em" label="new_curr" name="new_curr" value="'.$new_curr.'" />(For example: GBP, USD, EUR)</p>
+		<p>Allowed Paypal Currency codes are given <a href="https://cms.paypal.com/uk/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes" target="blank">here</a>.</p>
+		<p><span style="color:red; font-weight: bold; margin-right: 3px">Important!</span> If your currency is not listed the plugin will work but paypal will not accept the payment.</p>
 		<input type="hidden" name="alternative" value="' . $qpp_setup['alternative'] . '" />
 		<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Create New Form" /></p>
 		</form>
@@ -99,7 +100,7 @@ function qpp_setup ($id) {
 		<div class="qpp-options"> 
 		<h2>Adding the payment form to your site</h2>
 		<p>To add the basic payment form to your posts or pages use the shortcode: <code>[qpp]</code>.<br />
-		<p>If you have a named form the shortcode is <code>[qpp id="form name"]</code>.<br />
+		<p>If you have a named form the shortcode is <code>[qpp form="form name"]</code>.<br />
 		<p>To add the form to your theme files use <code>&lt;?php echo do_shortcode("[qpp]"); ?&gt;</code></p>
 		<p>There is also a widget called "Quick Paypal Payments" you can drag and drop into a sidebar.</p>
 		<p>That\'s it. The payment form is ready to use.</p>

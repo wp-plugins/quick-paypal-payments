@@ -14,7 +14,7 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 
 = Features =
 
-*	Accepts any currency
+*	Accepts all PayPal approved currencies
 *	Fixed or variable payment amounts
 *	Easy to use range of shortcode options
 *	Fully editable
@@ -60,6 +60,10 @@ Yes. But they have to have different names. Create the forms on the setup page.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://aerin.co.uk/contact-me/).
 
 == Changelog ==
+
+= 3.1
+*	Closed an XSS security hole
+*	Fixed the incorrect shortcode description
 
 = 3.0
 *	Multiple form support
