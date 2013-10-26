@@ -47,11 +47,11 @@ function qpp_display_form( $values, $errors, $id ) {
 	$content = "<div class='qpp-style ".$formstyle."'>\r\t";
 	$content .= "<div id='" . $style['border'] . "'>\r\t";
 	if ($errors)
-		$content .= "<h2>" . $error['errortitle'] . "</h2>\r\t<p class='error'>" . $error['errorblurb'] . "</p>\r\t";
+		$content .= "<h2>" . $error['errortitle'] . "</h2>\r\t<p style='color: #D31900;margin: 4px 0;'>" . $error['errorblurb'] . "</p>\r\t";
 	else
-		$content .= $qpp['title'] . "\r\t";
+		{$content .= $qpp['title'] . "\r\t";
 		if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imageabove') $content .= "<img src='".$qpp['paypal-url']."' />";
-		$content .=  $qpp['blurb'] . "\r\t";
+		$content .=  $qpp['blurb'] . "\r\t";}
 		$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
 	if (empty($values['id'])) {$values['reference'] = strip_tags($values['reference']); $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/></p>';}
 	else {
