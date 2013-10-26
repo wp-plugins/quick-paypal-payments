@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.1
+Version: 3.2
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -49,8 +49,10 @@ function qpp_display_form( $values, $errors, $id ) {
 	if ($errors)
 		$content .= "<h2>" . $error['errortitle'] . "</h2>\r\t<p class='error'>" . $error['errorblurb'] . "</p>\r\t";
 	else
-		$content .= $qpp['title'] . "\r\t" . $qpp['blurb'] . "\r\t";
-	$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
+		$content .= $qpp['title'] . "\r\t";
+		if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imageabove') $content .= "<img src='".$qpp['paypal-url']."' />";
+		$content .=  $qpp['blurb'] . "\r\t";
+		$content .= '<form id="frmPayment" name="frmPayment" method="post" action="" onsubmit="return validatePayment();">';
 	if (empty($values['id'])) {$values['reference'] = strip_tags($values['reference']); $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/></p>';}
 	else {
 		if ($values['explode']) {
@@ -66,8 +68,9 @@ function qpp_display_form( $values, $errors, $id ) {
 	$caption = $qpp['submitcaption'];
 	if ($style['submit-button']) $content .= '<p><input type="image" value="' . $caption . '" style="border:none;" src="'.$style['submit-button'].'" name="PaymentSubmit" /></p>';
 	else $content .= '<p><input type="submit" value="' . $caption . '" id="submit" name="qppsubmit'.$id.'" /></p>';
-	$content .= '</form>'."\r\t".
-		'</div>'."\r\t".
+	$content .= '</form>'."\r\t";
+		if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imagebelow') $content .= '<img src="'.$qpp['paypal-url'].'" />';
+		$content .= '</div>'."\r\t".
 		'</div>'."\r\t";
 	echo $content;
 	}
@@ -112,7 +115,6 @@ function qpp_current_page_url() {
 	else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 	return $pageURL;
 	}
-
 function qpp_loop($atts) {
 	ob_start();
 	extract(shortcode_atts(array( 'form' =>'','amount' => '' , 'id' => '', 'labels' => ''), $atts));
@@ -178,7 +180,7 @@ class qpp_widget extends WP_Widget {
 		<p>To configure the payment form use the <a href="'.get_admin_url().'options-general.php?page=quick-paypal-payments/quick-paypal-payments.php">Settings</a> page</p>
 		<?php
 		}
-}
+	}
 function qpp_use_custom_css () {
 	$qpp_form = qpp_get_stored_setup();
 	$arr = explode(",",$qpp_form['alternative']);
@@ -262,6 +264,7 @@ function qpp_get_default_options () {
 	$qpp['quantity'] = '1';
 	$qpp['shortcodereference'] = 'Payment for: ';
 	$qpp['shortcodeamount'] = 'Amount: ';
+	$qpp['paypal-location'] = 'imagebelow';
 	$qpp['submitcaption'] = 'Make Payment';
 	return $qpp;
 	}

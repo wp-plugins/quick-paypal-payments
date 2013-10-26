@@ -100,7 +100,7 @@ function qpp_setup ($id) {
 		<div class="qpp-options"> 
 		<h2>Adding the payment form to your site</h2>
 		<p>To add the basic payment form to your posts or pages use the shortcode: <code>[qpp]</code>.<br />
-		<p>If you have a named form the shortcode is <code>[qpp form="form name"]</code>.<br />
+		<p>If you have a named form the shortcode is <code>[qpp id="form name"]</code>.<br />
 		<p>To add the form to your theme files use <code>&lt;?php echo do_shortcode("[qpp]"); ?&gt;</code></p>
 		<p>There is also a widget called "Quick Paypal Payments" you can drag and drop into a sidebar.</p>
 		<p>That\'s it. The payment form is ready to use.</p>
@@ -111,8 +111,8 @@ function qpp_setup ($id) {
 		<p>You can also customise the <a href="?page=quick-paypal-payments/settings.php&tab=error">error messages</a>.</p>
 		<p>If it all goes wrong you can <a href="?page=quick-paypal-payments/settings.php&tab=reset">reset</a> everything.</p>
 		<p>To see all your payment messages click on the <b>Payments</b> link in the dashboard menu or <a href="?page=quick-paypal-payments/quick-paypal-messages.php">click here</a>.</p>
-		<h2>Version 3.0: What\'s New</h2>
-		<p>You can now add multiple forms to your site.</p>
+		<h2>Version 3.2: What\'s New</h2>
+		<p>Patched some security holes and added the option to display a PayPal logo on the form.</p>
 		<p>Please send bug reports and questions to <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>';	
 		$content .= donate_loop();
 		$content .= '</div>';
@@ -121,7 +121,7 @@ function qpp_setup ($id) {
 function qpp_form_options($id) {
 	qpp_change_form_update($id);
 	if( isset( $_POST['qpp_submit'])) {
-		$options = array('title','blurb','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target');
+		$options = array('title','blurb','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location');
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
 		update_option('qpp_options'.$id, $qpp);
 		qpp_admin_notice("The form and submission settings have been updated.");
@@ -133,7 +133,7 @@ function qpp_form_options($id) {
 	$qpp_setup = qpp_get_stored_setup();
 	$id=$qpp_setup['current'];
 	$qpp = qpp_get_stored_options($id);
-	$$qpp['target'] = 'checked';
+	$$qpp['paypal-location'] = 'checked';
 	$content = '<div class="qpp-options">';
 	if ($id) $content .='<h2 style="color:#B52C00">Form settings for ' . $id . '</h2>';
 	else $content .='<h2 style="color:#B52C00">Default form settings</h2>';
@@ -159,7 +159,12 @@ function qpp_form_options($id) {
 		<input type="text" style="width:90%" name="shortcodeamount" value="' . $qpp['shortcodeamount'] . '" />
 		<h2>Submit button caption</h2>
 		<input type="text" style="width:90%" name="submitcaption" value="' . $qpp['submitcaption'] . '" />
-		<p><input type="submit" name="qpp_submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the form settings?\' );"/></p>
+		<h2>PayPal Image</h2>
+		<p>Add a paypal image to your form. Enter the URL of the image below and slect where you want it to display.</p>
+		<p>Below form title: <input type="radio" label="paypal-location" name="paypal-location" value="imageabove" ' . $imageabove . ' /> Below Submit Button: <input type="radio" label="paypal-location" name="paypal-location" value="imagebelow" ' . $imagebelow . ' /></p>
+		<p>PayPal: <input type="text" style="width:25em" label="paypal-url" name="paypal-url" value="' . $qpp['paypal-url'] . '" /><br>
+		Leave blank if you don\'t want to use an image</p>
+	<p><input type="submit" name="qpp_submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the form settings?\' );"/></p>
 		</form>
 		</div>
 		<div class="qpp-options">
@@ -194,6 +199,7 @@ function qpp_styles($id) {
 	qpp_use_custom_css();
 	$content .='<div class="qpp-options">';
 	if ($id) $content .='<h2 style="color:#B52C00">Style options for ' . $id . '</h2>';
+
 	else $content .='<h2 style="color:#B52C00">Default form style options</h2>';
 	$content .= qpp_change_form($qpp_setup);
 	$content .= '

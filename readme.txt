@@ -61,11 +61,15 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
-= 3.1
+= 3.2 =
+*	Added the option to display a PayPal logo on the form
+
+
+= 3.1 =
 *	Closed an XSS security hole
 *	Fixed the incorrect shortcode description
 
-= 3.0
+= 3.0 =
 *	Multiple form support
 *	Dashboard link to display and download payment records
 *	Add options to your forms using shortcodes
