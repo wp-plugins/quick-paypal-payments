@@ -384,7 +384,6 @@ function qpp_get_stored_options ($id) {
 function qpp_get_default_options () {
 	$qpp = array();
 	$qpp['sort'] = implode(',',array('field1','field4','field2','field3','field5','field6','field7','field8'));
-    if (!$qpp['sort']['field8']) $qpp['sort']['field8'] ='';
     $qpp['title'] = 'Payment Form';
 	$qpp['blurb'] = 'Enter the payment details and submit';
 	$qpp['inputreference'] = 'Payment reference';
