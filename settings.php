@@ -188,14 +188,10 @@ function qpp_form_options($id) {
 		<input type="text" style="width:100%" name="blurb" value="' . $qpp['blurb'] . '" />
 		<h2>Form Fields</h2>
 		<p>Drag and drop to change order of the fields</p>
-		<p>
-		<span style="width:30%;">Form Fields</span>
-		<span style="width:70%;">Labels and Options</span>
-		</p>
+		<div style="margin-left:7px;font-weight:bold;"><div style="float:left; width:30%;">Form Fields</div><div style="float:left; width:30%;">Labels and Options</div></div>
 		<div style="clear:left"></div>
 		<ul id="qpp_sort">';
 		foreach (explode( ',',$qpp['sort']) as $name) {
-			$checked = ( $qcf['active_buttons'][$name]) ? 'checked' : '';
 			switch ( $name ) {
 				case 'field1': $check = '&nbsp;';
 					$type = 'Reference';
@@ -237,9 +233,9 @@ function qpp_form_options($id) {
 <span class="description">Processing reference (appears on the PayPal payment):</span><br>
 						<input type="text" name="processref" value="' . $qpp['processref'] . '" />'; 
 					break;
-                case 'field8': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="captcha" ' . $qpp['captchaß'] . ' value="checked" />';
+                case 'field8': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="captcha" ' . $qpp['captcha'] . ' value="checked" />';
 					$type = 'Maths Captcha';
-					$input = 'mathscaption';$checked = 'checked';$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</spam>';
+					$input = 'mathscaption';$checked = $qpp['captcha'];$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</spam>';
 					break;
 		}
 	$li_class = ( $checked) ? 'button_active' : 'button_inactive';	
