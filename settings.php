@@ -244,6 +244,17 @@ function qpp_form_options($id) {
 					$type = 'Maths Captcha';
 					$input = 'mathscaption';$checked = $qpp['captcha'];$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</spam>';
 					break;
+                case 'field9': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usecoupon" ' . $qpp['usecoupon'] . ' value="checked" />';
+					$type = 'Coupon Code';
+					$input = 'couponblurb';$checked = $qpp['usecoupon'];
+					$options = '<span class="description">Coupon code:</span><br>
+                    <input type="text" name="couponcode" value="' . $qpp['couponcode'] . '" /><br>
+                    <span class="description">Coupon code:</span><br>
+						<input style="margin:0; padding:0; border:none;" type="radio" name="coupontype" value="couponpercent" ' . $couponpercent . ' /> Percentage of the total: <input type="text" style="width:4em;padding:2px" label="couponpercent" name="couponpercent" value="' . $qpp['couponpercent'] . '" /> %<br>
+						<input style="margin:0; padding:0; border:none;" type="radio" name="coupontype" value="couponfixed" ' . $couponfixed . ' /> Fixed amount: <input type="text" style="width:4em;padding:2px" label="couponfixed" name="couponfixed" value="' . $qpp['couponfixed'] . '" /> '.$currency[$id].'<br>
+<span class="description">Coupon reference (appears on the PayPal payment):</span><br>
+						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" />'; 
+					break;
 		}
 	$li_class = ( $checked) ? 'button_active' : 'button_inactive';	
 	$content .='<li class="'.$li_class.'" id="'.$name.'">
@@ -267,8 +278,8 @@ function qpp_form_options($id) {
 		<p>Upload an image and select where you want it to display (Leave blank if you don\'t want to use an image).</p>
 		<p>Below form title: <input type="radio" label="paypal-location" name="paypal-location" value="imageabove" ' . $imageabove . ' /> Below Submit Button: <input type="radio" label="paypal-location" name="paypal-location" value="imagebelow" ' . $imagebelow . ' /></p>
 		<p>
-		<input id="upload_image" type="text" name="paypal-url" value="' . $qpp['paypal-url'] . '" />
-   		<input id="upload_media_button" class="button" type="button" value="Upload Image" />
+		<input id="qpp_upload_image" type="text" name="paypal-url" value="' . $qpp['paypal-url'] . '" />
+   		<input id="qpp_upload_media_button" class="button" type="button" value="Upload Image" />
 		<p><input type="submit" name="qpp_submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the form settings?\' );"/></p>
 		<input type="hidden" id="qpp_settings_sort" name="sort" value="'.$qpp['sort'].'" />
 		</form>
