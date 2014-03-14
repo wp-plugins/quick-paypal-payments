@@ -64,6 +64,9 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.5.3 =
+*	Fixed error when using % postage or processing fees
+
 = 3.5.1 =
 *	Bug fix to clear illegal offset warning
 
