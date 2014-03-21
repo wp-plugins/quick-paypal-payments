@@ -23,7 +23,36 @@ function qpp_messages_admin_tabs($current = 'default') {
 function qpp_show_messages($id) {
 	if ($id == 'default') $id='';
 	$qpp_setup = qpp_get_stored_setup();
-	$qpp = qpp_get_stored_options($id);
+    $currency = qpp_get_stored_curr();
+	$before = array(
+        'USD'=>'&#x24;',
+        'CDN'=>'&#x24;',
+        'EUR'=>'&euro;',
+        'GBP'=>'&pound;',
+        'JPY'=>'&yen;',
+        'AUD'=>'&#x24;',
+        'BRL'=>'R&#x24;',
+        'HKD'=>'&#x24;',
+        'ILS'=>'&#x20aa;',
+                'MXN'=>'&#x24;',
+        'NZD'=>'&#x24;','PHP'=>'&#8369;',
+                       'SGD'=>'&#x24;',
+               'TWD'=>'NT&#x24;',
+               'TRY'=>'&pound;');
+    $after = array(
+        'CZK'=>'K&#269;',
+        'DKK'=>'Kr',
+        'HUF'=>'Ft',
+        'MYR'=>'RM',
+        'NOK'=>'kr',
+                'PLN'=>'z&#322',
+        'RUB'=>'&#1056;&#1091;&#1073;',
+        'SEK'=>'kr',
+        'CHF'=>'CHF',
+        'THB'=>'&#3647;');
+	foreach($before as $item=>$key) {if ($item == $currency[$id]) $b = $key;}
+     foreach($after as $item=>$key) {if ($item == $currency[$id]) $a = $key;}  
+    $qpp = qpp_get_stored_options($id);
 	qpp_generate_csv();
 	if (isset($_POST['qpp_reset_message'.$id])) delete_option('qpp_messages'.$id);
 	if( isset( $_POST['Submit'])) {
@@ -51,22 +80,68 @@ function qpp_show_messages($id) {
 	if(!is_array($message)) $message = array();
 	$title = $id; if ($id == '') $title = 'Default';
 	$dashboard .= '<div class="wrap"><div id="qpp-widget">';
-	$dashboard .= '<table cellspacing="0"><tr>';
-	$dashboard .= '<th>Date Sent</th><th>'.$options['inputreference'].'</th><th>'.$options['quantitylabel'].'</th><th>'.$options['inputamount'].'</th></tr>';
-	if ($messageoptions['messageorder'] == 'newest') {
-	foreach(array_reverse( $message ) as $value) {
-		if ($count < $showthismany ) {
-			if ($value['date']) $report = 'messages';
-			$content .= '<tr><td>'.strip_tags($value['field0']).'</td><td>'.strip_tags($value['field1']).'</td><td>'.strip_tags($value['field2']).'</td><td>'.strip_tags($value['field3']).'</td></tr>';
-			$count = $count+1;	}
+	$dashboard .= '<table cellspacing="0"><tr><th>Date Sent</th>';
+	foreach (explode( ',',$options['sort']) as $name) {
+        $title='';
+		switch ( $name ) {
+			case 'field1': $title=$options['inputreference'];break;
+			case 'field2': $title=$options['quantitylabel'];break;
+			case 'field3': $title=$options['inputamount'];break;
+			case 'field4': if ($options['usestock']) $title=$options['stock'];break;
+			case 'field5': if ($options['use_options']) $title=$options['optionlabel'];break;
+			case 'field6': if ($options['usecoupon']) $title=$options['couponblurb'];break;
 			}
+        $dashboard .= '<th>'.$title.'</th>';
+        }	
+    $dashboard .= '</tr>';
+	if ($messageoptions['messageorder'] == 'newest') {
+        foreach(array_reverse( $message ) as $value) {
+            if ($count < $showthismany ) {
+                if ($value['date']) $report = 'messages';
+                $content .= '<tr><td>'.strip_tags($value['field0']).'</td>';
+                foreach (explode( ',',$options['sort']) as $name) {
+                    $title='';
+$amount = preg_replace ( '/[^.,0-9]/', '', $value['field3']);
+
+                    
+switch ( $name ) {
+                        case 'field1': $title=$value['field1'];break;
+                        case 'field2': $title=$value['field2'];break;
+                        case 'field3': $title=$b.$amount.$a;break;
+                        case 'field4': if ($options['usestock']) $title=$value['field4'];break;
+                        case 'field5': if ($options['use_options']) $title=$value['field5'];break;
+                        case 'field6': if ($options['usecoupon']) $title=$value['field6'];break;
+                        }
+                    $content .= '<td>'.$title.'</td>';
+                    }
+                $content .='</tr>';
+                $count = $count+1;
+                }
+            }
 		}
 	else {
-	foreach($message as $value) {
-		if ($count < $showthismany ) {
-			if ($value['date']) $report = 'messages';
-			$content .= '<tr><td>'.strip_tags($value['field0']).'</td><td>'.strip_tags($value['field1']).'</td><td>'.strip_tags($value['field2']).'</td><td>'.strip_tags($value['field3']).'</td></tr>';
-			$count = $count+1;	}
+	   foreach($message as $value) {
+           if ($count < $showthismany ) {
+               if ($value['date']) $report = 'messages';
+               $content .= '<tr><td>'.strip_tags($value['field0']).'</td>';
+               foreach (explode( ',',$options['sort']) as $name) {
+                   $title='';
+$amount = preg_replace ( '/[^.,0-9]/', '', $value['field3']);
+
+                   
+switch ( $name ) {
+                       case 'field1': $title=$value['field1'];break;
+                       case 'field2': $title=$value['field2'];break;
+                       case 'field3': $title=$b.$amount.$a;break;
+                       case 'field4': if ($options['usestock']) $title=$value['field4'];break;
+                       case 'field5': if ($options['use_options']) $title=$value['field5'];break;
+                       case 'field6': if ($options['usecoupon']) $title=$value['field6'];break;
+                        }
+                   $content .= '<td>'.$title.'</td>';
+                    }
+               $content .='</tr>';
+               $count = $count+1;
+            }
 			}
 		}	
 	if ($report) $dashboard .= $content.'</table>';

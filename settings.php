@@ -56,6 +56,7 @@ function qpp_tabbed_page() {
 		case 'process' : qpp_process ($id); break;
 		case 'shortcodes' : qpp_shortcodes (); break;
 		case 'reset' : qpp_reset_page($id); break;
+        case 'coupon' : qpp_coupon_codes($id); break;
 		}
 	echo '</div>';
 	}
@@ -158,7 +159,7 @@ function qpp_setup ($id) {
 function qpp_form_options($id) {
 	qpp_change_form_update($id);
 	if( isset( $_POST['qpp_submit'])) {
-		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','captcha','mathscaption');
+		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','coupontype','couponpercent','couponfixed','couponcode','captcha','mathscaption');
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
 		update_option('qpp_options'.$id, $qpp);
 		qpp_admin_notice("The form and submission settings have been updated.");
@@ -174,6 +175,7 @@ function qpp_form_options($id) {
 	$$qpp['paypal-location'] = 'checked';
 	$$qpp['processtype'] = 'checked';
 	$$qpp['postagetype'] = 'checked';
+    $$qpp['coupontype'] = 'checked';
 	$content = '<script>
 		jQuery(function() {
 			var qpp_sort = jQuery( "#qpp_sort" ).sortable({ axis: "y" ,
@@ -247,13 +249,9 @@ function qpp_form_options($id) {
                 case 'field9': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usecoupon" ' . $qpp['usecoupon'] . ' value="checked" />';
 					$type = 'Coupon Code';
 					$input = 'couponblurb';$checked = $qpp['usecoupon'];
-					$options = '<span class="description">Coupon code:</span><br>
-                    <input type="text" name="couponcode" value="' . $qpp['couponcode'] . '" /><br>
-                    <span class="description">Coupon code:</span><br>
-						<input style="margin:0; padding:0; border:none;" type="radio" name="coupontype" value="couponpercent" ' . $couponpercent . ' /> Percentage of the total: <input type="text" style="width:4em;padding:2px" label="couponpercent" name="couponpercent" value="' . $qpp['couponpercent'] . '" /> %<br>
-						<input style="margin:0; padding:0; border:none;" type="radio" name="coupontype" value="couponfixed" ' . $couponfixed . ' /> Fixed amount: <input type="text" style="width:4em;padding:2px" label="couponfixed" name="couponfixed" value="' . $qpp['couponfixed'] . '" /> '.$currency[$id].'<br>
-<span class="description">Coupon reference (appears on the PayPal payment):</span><br>
-						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" />'; 
+					$options = '<span class="description">Coupon reference (appears on the PayPal payment):</span><br>
+						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" /><br>
+                        <a href="?page=quick-paypal-payments/settings.php&tab=coupon">Add coupon codes</a>'; 
 					break;
 		}
 	$li_class = ( $checked) ? 'button_active' : 'button_inactive';	
@@ -448,7 +446,7 @@ function qpp_error_page($id) {
 		}
 	if( isset( $_POST['Reset'])) {
 		delete_option('qpp_error'.$id);
-		qpp_admin_notice("The error messageshave been reset.");
+		qpp_admin_notice("The error messages have been reset.");
 		}
 	$qpp_setup = qpp_get_stored_setup();
 	$id=$qpp_setup['current'];
@@ -471,6 +469,80 @@ function qpp_error_page($id) {
 		<h2>Error Checker</h2>
 		<p>Try sending a blank form to test your error messages.</p>';
 	$args = array('form' => $id, 'id' => '', 'amount' => '');
+	$content .= qpp_loop($args);
+	$content .= '</div></div>';
+	echo $content;
+	}
+function qpp_coupon_codes($id) {
+	qpp_change_form_update();
+	if( isset( $_POST['Submit'])) {
+        $options = array('code','coupontype','couponpercent','couponfixed');
+        for ($i=1; $i<=10; $i++) {
+        foreach ( $options as $item) $coupon[$item.$i] = stripslashes($_POST[$item.$i]);
+        }
+		update_option( 'qpp_coupon'.$id, $coupon );
+		qpp_admin_notice("The coupon settings have been updated.");
+		}
+	if( isset( $_POST['Reset'])) {
+		delete_option('qpp_error'.$id);
+		qpp_admin_notice("The coupon settings have been reset.");
+		}
+	$qpp_setup = qpp_get_stored_setup();
+    $id = $qpp_setup['current'];
+    $currency = qpp_get_stored_curr();
+    $before = array(
+        'USD'=>'&#x24;',
+        'CDN'=>'&#x24;',
+        'EUR'=>'&euro;',
+        'GBP'=>'&pound;',
+        'JPY'=>'&yen;',
+        'AUD'=>'&#x24;',
+        'BRL'=>'R&#x24;',
+        'HKD'=>'&#x24;',
+        'ILS'=>'&#x20aa;',
+                'MXN'=>'&#x24;',
+        'NZD'=>'&#x24;','PHP'=>'&#8369;',
+                       'SGD'=>'&#x24;',
+               'TWD'=>'NT&#x24;',
+               'TRY'=>'&pound;');
+    $after = array(
+        'CZK'=>'K&#269;',
+        'DKK'=>'Kr',
+        'HUF'=>'Ft',
+        'MYR'=>'RM',
+        'NOK'=>'kr',
+                'PLN'=>'z&#322',
+        'RUB'=>'&#1056;&#1091;&#1073;',
+        'SEK'=>'kr',
+        'CHF'=>'CHF',
+        'THB'=>'&#3647;');
+	foreach($before as $item=>$key) {if ($item == $currency[$id]) $b = $key;}
+     foreach($after as $item=>$key) {if ($item == $currency[$id]) $a = $key;}  
+	$coupon = qpp_get_stored_coupon($id);
+    $content ='<div class="qpp-settings"><div class="qpp-options">';
+	if ($id) $content .='<h2>Coupons codes for ' . $id . '</h2>';
+	else $content .='<h2>Default form coupions codes</h2>';
+	$content .= qpp_change_form($qpp_setup);
+	$content .= '<form method="post" action="">
+		<p<span<b>Note:</b> Leave fields blank if you don\'t want to use them</span></p>
+		<table>
+        <tr><td>Coupon Code</td><td>Percentage</td><td>Fixed Amount</td></tr>
+        ';
+    for ($i=1; $i<=10; $i++) {
+        $percent = ($coupon['coupontype'.$i] == 'percent'.$i ? 'checked' : '');
+        $fixed = ($coupon['coupontype'.$i] == 'fixed'.$i ? 'checked' : ''); 
+        $content .= '<tr><td><input type="text" name="code'.$i.'" value="' . $coupon['code'.$i] . '" /></td>
+        <td><input style="margin:0; padding:0; border:none;" type="radio" name="coupontype'.$i.'" value="percent'.$i.'" ' . $percent . ' /> <input type="text" style="width:4em;padding:2px" label="couponpercent'.$i.'" name="couponpercent'.$i.'" value="' . $coupon['couponpercent'.$i] . '" /> %</td>
+        <td><input style="margin:0; padding:0; border:none;" type="radio" name="coupontype'.$i.'" value="fixed'.$i.'" ' . $fixed.' />&nbsp;'.$b.'&nbsp;<input type="text" style="width:4em;padding:2px" label="couponfixed'.$i.'" name="couponfixed'.$i.'" value="' . $coupon['couponfixed'.$i] . '" /> '.$a.'</td></tr>';
+    }
+    $content .= '</table>
+		<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the coupon codes?\' );"/></p>
+		</form>
+		</div>
+		<div class="qpp-options" style="float:right;">
+		<h2>Coupon Check</h2>
+		<p>Test your coupon codes.</p>';
+	$args = array('form' => $id, 'id' => 'Coupon Test', 'amount' => '$100');
 	$content .= qpp_loop($args);
 	$content .= '</div></div>';
 	echo $content;
@@ -564,6 +636,9 @@ function qpp_generate_csv() {
 		array_push($headerrow, $qpp['inputreference']);
 		array_push($headerrow, $qpp['quantitylabel']);
 		array_push($headerrow, $qpp['inputamount']);
+		array_push($headerrow, $qpp['stock']);
+		array_push($headerrow, $qpp['optionlabel']);
+		array_push($headerrow, $qpp['couponblurb']);
 		fputcsv($outstream,$headerrow, ',', '"');
 		foreach(array_reverse( $message ) as $value) {
 			$cells = array();
@@ -571,6 +646,9 @@ function qpp_generate_csv() {
 			array_push($cells,$value['field1']);
 			array_push($cells,$value['field2']);
 			array_push($cells,$value['field3']);
+			array_push($cells,$value['field4']);
+			array_push($cells,$value['field5']);
+			array_push($cells,$value['field6']);
 			fputcsv($outstream,$cells, ',', '"');
 			}
 		fclose($outstream); 
