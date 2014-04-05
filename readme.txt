@@ -64,6 +64,11 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.7 =
+*	Improved coupon support
+*	Option to change PayPal locale
+*	Payment records now download properly
+
 = 3.6 =
 *	You can now add coupon codes to the form
 *	Updated payments reports

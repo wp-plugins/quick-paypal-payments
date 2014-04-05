@@ -3,12 +3,14 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.6
+Version: 3.6.2
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
 
 add_shortcode('qpp', 'qpp_start');
+add_shortcode('qppreport', 'qpp_report');
+
 add_filter('plugin_action_links', 'qpp_plugin_action_links', 10, 2 );
 add_action('init', 'qpp_init');
 add_action('wp_enqueue_scripts','qpp_enqueue_scripts');
@@ -63,6 +65,7 @@ function qpp_display_form( $values, $errors, $id ) {
 	$qpp_form = qpp_get_stored_setup();
 	$qpp = qpp_get_stored_options($id);
 	$error = qpp_get_stored_error($id);
+    $coupon = qpp_get_stored_coupon($id);
 	$send = qpp_get_stored_send($id);
 	$style = qpp_get_stored_style($id);
 	if ($id) $formstyle=$id; else $formstyle='default';
@@ -105,7 +108,7 @@ function qpp_display_form( $values, $errors, $id ) {
 						$content .= '<p class="payment" >'.$qpp['shortcodeamount'].'<br>';
 						foreach ($ref as $item) { $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="amount" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';$checked='';}
 						$content .= '</p>';}
-					else $content .= '<p class="input" >' . $values['amount'] . '</p>';
+					else $content .= '<p class="input" >' . $values['amount'] . '</p><input type="hidden" name="amount" value="'.$values['amount'].'" />';
 					}
 					break;
 				case 'field5':
@@ -140,10 +143,14 @@ function qpp_display_form( $values, $errors, $id ) {
 			}		
 					break;
             case 'field9':
-					if ($qpp['usecoupon']) {$content .= '<p><input type="text" label="coupon" name="couponblurb" value="' . $values['couponblurb'] . '" onfocus="qppclear(this, \'' . $values['couponblurb'] . '\')" onblur="qpprecall(this, \'' . $values['couponblurb'] . '\')"/></p>';}
-					break;	
+					if ($qpp['usecoupon'] && $values['couponapplied']) $content .= '<p>'.$qpp['couponref'].'</p>';
+                    if ($qpp['usecoupon'] && !$values['couponapplied']){$content .= '<p><input type="text" label="coupon" name="couponblurb" value="' . $values['couponblurb'] . '" onfocus="qppclear(this, \'' . $values['couponblurb'] . '\')" onblur="qpprecall(this, \'' . $values['couponblurb'] . '\')"/></p>
+                    <p><input type="submit" value="'.$qpp['couponbutton'].'" id="submitcoupon" name="qppapply'.$id.'" /></p>';}
+					$content .= '<input type="hidden" name="couponapplied" value="'.$values['couponapplied'].'" />';
+                    break;	
 			}
 		}	
+    
 	$caption = $qpp['submitcaption'];
 	if ($style['submit-button']) $content .= '<p><input type="image" value="' . $caption . '" style="border:none;width:100%;height:auto;overflow:hidden;" src="'.$style['submit-button'].'" name="qppsubmit'.$id.'" onClick="replaceContentInContainer(\'place'.$id.'\', \'rep_place'.$id.'\')"/>';
 	else $content .= '<p><input type="submit" value="' . $caption . '" id="submit" name="qppsubmit'.$id.'" onClick="replaceContentInContainer(\'place'.$id.'\', \'rep_place'.$id.'\')"/></p>';
@@ -152,6 +159,7 @@ function qpp_display_form( $values, $errors, $id ) {
 	$content .= '<div style="clear:both;"></div></div></div>'."\r\t";
 	echo $content;
 	}
+
 function qpp_process_form($values,$id) {
 	$currency = qpp_get_stored_curr();
 	$qpp = qpp_get_stored_options($id);
@@ -165,19 +173,11 @@ function qpp_process_form($values,$id) {
 	if (empty($send['thanksurl'])) $send['thanksurl'] = $page_url;
 	if (empty($send['cancelurl'])) $send['cancelurl'] = $page_url;
 	if ($send['target'] == 'newpage') $target = ' target="_blank" ';
+    
 	$check = preg_replace ( '/[^.,0-9]/', '', $values['amount']);
-    if ($qpp['usecoupon']) {
-         for ($i=1; $i<=10; $i++) {
-            if ($values['couponblurb'] == $coupon['code'.$i]) {
-                $couponcode = $coupon['code'.$i];
-                if ($coupon['coupontype'.$i] == 'percent'.$i) $check = $check - ($check * $coupon['couponpercent'.$i]/100);
-                if ($coupon['coupontype'.$i] == 'fixed'.$i) $check = $check - $coupon['couponfixed'.$i];
-                $couponref = ' ('.$qpp['couponref'].')';}
-            }
-        }
     $decimal = array('HKD','JPY','MYR','TWD');$d='2';
-foreach ($decimal as $item) if ($item == $currency[$id]) $d ='0';
-$check = number_format($check, $d);   
+    foreach ($decimal as $item) if ($item == $currency[$id]) $d ='0';
+    $check = number_format($check, $d);
     $quantity =($values['quantity'] < 1 ? '1' : strip_tags($values['quantity']));
    	if ($qpp['useprocess'] && $qpp['processtype'] == 'processpercent') {
 		$percent = preg_replace ( '/[^.,0-9]/', '', $qpp['processpercent']) / 100;
@@ -215,18 +215,16 @@ $check = number_format($check, $d);
         <input type="hidden" name="no_shipping" value="1">
         <input type="hidden" name="currency_code" value="' .  $currency[$id] . '">
         <input type="hidden" name="item_name_1" value="' .$qpp['inputreference'] . ': ' . strip_tags($values['reference']);
-	if ($qpp['use_options']) $content .= ' - '.strip_tags($values['option1']);
-	$content .=$couponref.'">';
+    if ($qpp['use_options']) $content .= ' - '.strip_tags($values['option1']);
+    $content .= '" />';
 	if ($qpp['use_stock']) $content .= '<input type="hidden" name="item_number_1" value="' .$qpp['stocklabel'] . ': ' . strip_tags($values['stock']) . '">';
 	$content .= '<input type="hidden" name="quantity_1" value="' . $quantity . '">
 		<input type="hidden" name="amount_1" value="' . $check . '">';
 	if ($qpp['useprocess']) $content .='<input type="hidden" name="item_name_2" value="'.$qpp['processref'].'">
 		<input type="hidden" name="amount_2" value="' . $handling . '">';
 	if ($qpp['usepostage']) $content .='<input type="hidden" name="item_name_3" value="'.$qpp['postageref'].'">
-		<input type="hidden" name="amount_3" value="' . $packing . '">
-<input type="hidden" name="item_name_4" value="Derek">
-<input type="hidden" name="amount_4" value="-10">';
-
+		<input type="hidden" name="amount_3" value="' . $packing . '">';
+    if ($send['use_lc']) $content .= '<input type="hidden" name="lc" value="' . $send['lc'] . '"><input type="hidden" name="country" value="' . $send['lc'] . '">';
 	$content .='</form>
 		<script language="JavaScript">document.getElementById("frmCart").submit();</script>';
 	echo $content;
@@ -239,6 +237,41 @@ function qpp_current_page_url() {
 	else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 	return $pageURL;
 	}
+function qpp_currency ($id) {
+    $currency = qpp_get_stored_curr();
+    $c = array();
+	$before = array(
+        'USD'=>'&#x24;',
+        'CDN'=>'&#x24;',
+        'EUR'=>'&euro;',
+        'GBP'=>'&pound;',
+        'JPY'=>'&yen;',
+        'AUD'=>'&#x24;',
+        'BRL'=>'R&#x24;',
+        'HKD'=>'&#x24;',
+        'ILS'=>'&#x20aa;',
+        'MXN'=>'&#x24;',
+        'NZD'=>'&#x24;',
+        'PHP'=>'&#8369;',
+        'SGD'=>'&#x24;',
+        'TWD'=>'NT&#x24;',
+        'TRY'=>'&pound;');
+    $after = array(
+        'CZK'=>'K&#269;',
+        'DKK'=>'Kr',
+        'HUF'=>'Ft',
+        'MYR'=>'RM',
+        'NOK'=>'kr',
+        'PLN'=>'z&#322',
+        'RUB'=>'&#1056;&#1091;&#1073;',
+        'SEK'=>'kr',
+        'CHF'=>'CHF',
+        'THB'=>'&#3647;');
+    foreach($before as $item=>$key) {if ($item == $currency[$id]) $c['b'] = $key;}
+    foreach($after as $item=>$key) {if ($item == $currency[$id]) $c['a'] = $key;}
+    return $c;
+    }
+
 function qpp_loop($atts) {
 	ob_start();
 	extract(shortcode_atts(array( 'form' =>'','amount' => '' , 'id' => '','stock' => '', 'labels' => ''), $atts));
@@ -246,11 +279,13 @@ function qpp_loop($atts) {
 	$formvalues['quantity'] = 1;
 	$formvalues['stock'] = $qpp['stocklabel'].' ';
     $formvalues['couponblurb'] = $qpp['couponblurb'];
-	if (!$labels) {
+           
+    if (!$labels) {
         $shortcodereference = $qpp['shortcodereference'].' ';
         $shortcodeamount = $qpp['shortcodeamount'].' ';
         }
-	if ($id) {
+    
+    if ($id) {
 		$formvalues['id'] = 'checked';
 		if (strrpos($id,',')) {$formvalues['reference'] = $id;$formvalues['explode'] = 'checked';}
 		else $formvalues['reference'] = $shortcodereference.$id;
@@ -263,13 +298,33 @@ function qpp_loop($atts) {
         else $formvalues['amount'] = $shortcodeamount.$amount;
         }
 	else {$formvalues['amount'] = $qpp['inputamount'];$formvalues['pay'] = '';}
-	
+    
+    if (isset($_POST['qppapply'.$form]) || isset($_POST['qppsubmit'.$form]) || isset($_POST['qppsubmit'.$form.'_x'])) {
+        $_POST = qpp_sanitize($_POST);
+        if (isset($_POST['reference'])) $id = $_POST['reference'];
+        if (isset($_POST['amount'])) $amount = $_POST['amount'];
+        $arr = array('reference','amount','stock','quantity','option1','couponblurb','maths','thesum','answer');
+        foreach($arr as $item) if (isset($_POST[$item])) $formvalues[$item] = $_POST[$item];
+        }
+    
+    if (isset($_POST['qppapply'.$form])) {
+    	$check = preg_replace ( '/[^.,0-9]/', '', $formvalues['amount']); 
+            $coupon = qpp_get_stored_coupon($form);
+            $c = qpp_currency ($form);
+            for ($i=1; $i<=10; $i++) {
+                if ($formvalues['couponblurb'] == $coupon['code'.$i]) {
+                    if ($coupon['coupontype'.$i] == 'percent'.$i) $check = $check - ($check * $coupon['couponpercent'.$i]/100);
+                    if ($coupon['coupontype'.$i] == 'fixed'.$i) $check = $check - $coupon['couponfixed'.$i];
+                    if ($check > 0) {
+                        $formvalues['couponapplied'] = 'checked';
+                        $formvalues['pay'] = 'checked';
+                        $formvalues['amount'] = $shortcodeamount.$c['b'].$check.$c['a'];
+                    } else $formvalues['couponblurb'] = $qpp['couponblurb'];
+                }
+            }
+        }
+    
     if (isset($_POST['qppsubmit'.$form]) || isset($_POST['qppsubmit'.$form.'_x'])) {
-		$_POST = qpp_sanitize($_POST);
-		if (isset($_POST['reference'])) {$formvalues['reference'] = $_POST['reference'];$id = $_POST['reference'];}
-        if (isset($_POST['amount'])) {$formvalues['amount'] = $_POST['amount'];$amount = $_POST['amount'];}
-		$arr = array('stock','quantity','option1','couponblurb','maths','thesum','answer');
-		foreach($arr as $item) if (isset($_POST[$item])) $formvalues[$item] = $_POST[$item];
 		if (qpp_verify_form($formvalues,$form)) qpp_display_form($formvalues,'error',$form);
    		else {
 			if ($amount) $formvalues['amount'] = $amount;
@@ -277,7 +332,8 @@ function qpp_loop($atts) {
 			qpp_process_form($formvalues,$form);
 			}
 		}
-	else {	$digit1 = mt_rand(1,10);
+	 
+    else {	$digit1 = mt_rand(1,10);
 		$digit2 = mt_rand(1,10);
 		if( $digit2 >= $digit1 ) {
 		$formvalues['thesum'] = "$digit1 + $digit2";
@@ -292,11 +348,13 @@ function qpp_loop($atts) {
 	ob_end_clean();
 	return $output_string;
 	}
+
 function qpp_sanitize($input) {
     if (is_array($input)) foreach($input as $var=>$val) $output[$var] = filter_var($val, FILTER_SANITIZE_STRING);
     return $output;
     }
 function register_qpp_widget() {register_widget( 'qpp_Widget' );}
+
 add_action( 'widgets_init', 'register_qpp_widget' );
 
 class qpp_widget extends WP_Widget {
@@ -306,14 +364,14 @@ class qpp_widget extends WP_Widget {
 			'Paypal Payments', // Name
 			array( 'description' => __( 'Paypal Payments', 'Add paypal payment form to your sidebar' ), ) // Args
 		);
-	}
+	   }
 	public function widget( $args, $instance ) {
 		extract($args, EXTR_SKIP);
 		$id=$instance['id'];
 		$amount=$instance['amount'];
         $form=$instance['form'];
 		echo qpp_loop($instance);
-	}
+	   }
  	public function update($new_instance, $old_instance) {
 		$instance = $old_instance;
 		$instance['id'] = $new_instance['id'];
@@ -365,6 +423,7 @@ function qpp_generate_css() {
 		if ($style['submitwidth'] == 'submitpixel') $submitwidth = 'width:'.$style['submitwidthset'].';';
 		if ($style['submitposition'] == 'submitleft') $submitposition = 'float:left;'; else $submitposition = 'float:right;';
 		$submitbutton = ".qpp-style".$id." #submit, .qpp-style".$id." #submit:hover{".$submitposition.$submitwidth."color:".$style['submit-colour'].";background:".$style['submit-background'].";border:".$style['submit-border'].";".$submitfont.";font-size: inherit;}\r\n";
+        $couponbutton = ".qpp-style".$id." #couponsubmit, .qpp-style".$id." #couponsubmit:hover{".$submitposition.$submitwidth."color:".$style['coupon-colour'].";background:".$style['coupon-background'].";border:".$style['submit-border'].";".$submitfont.";font-size: inherit;}\r\n";
 		if ($style['border']<>'none') $border =".qpp-style".$id." #".$style['form-border']." {border:".$style['form-border'].";}\r\n";
 		if ($style['background'] == 'white') $background = ".qpp-style".$id." div {background:#FFF;}\r\n";
 		if ($style['background'] == 'color') $background = ".qpp-style".$id." div {background:".$style['backgroundhex'].";}\r\n";
@@ -374,7 +433,7 @@ function qpp_generate_css() {
 		if ($style['corners'] == 'round') $corner = '5px'; else $corner = '0';
 		$corners = ".qpp-style".$id." input[type=text], .qpp-style".$id." textarea, .qpp-style".$id." select, .qpp-style".$id." #submit {border-radius:".$corner.";}\r\n";
 		if ($style['corners'] == 'theme') $corners = '';
-		$code .= ".qpp-style".$id." {width:".$width.";}\r\n".$border.$corners.$header.$paragraph.$input.$background.$submitbutton;
+		$code .= ".qpp-style".$id." {width:".$width.";}\r\n".$border.$corners.$header.$paragraph.$input.$background.$submitbutton.$couponbutton;
 		if ($style['use_custom'] == 'checked') $code .= $style['styles'] . "\r\n";
 		}
 	return $code;
@@ -382,6 +441,79 @@ function qpp_generate_css() {
 function qpp_head_css () {
 	$data = '<style type="text/css" media="screen">'.qpp_generate_css().'</style>';
 	echo $data;
+	}
+
+function qpp_report($atts) {
+	extract(shortcode_atts(array( 'form' =>''), $atts));
+	return qpp_messagetable($form);
+	}
+function qpp_messagetable ($id) {
+	$options = qpp_get_stored_options ($id);
+	$message = get_option('qpp_messages'.$id);
+	$messageoptions = qpp_get_stored_msg();
+	$c = qpp_currency ($id);
+	$showthismany = '9999';
+	if ($messageoptions['messageqty'] == 'fifty') $showthismany = '50';
+	if ($messageoptions['messageqty'] == 'hundred') $showthismany = '100';
+	$$messageoptions['messageqty'] = "checked";
+	$$messageoptions['messageorder'] = "checked";
+	if(!is_array($message)) $message = array();
+	$title = $id; if ($id == '') $title = 'Default';
+	$dashboard .= '<div class="wrap"><div id="qpp-widget">';
+	$dashboard .= '<table cellspacing="0"><tr><th>Date Sent</th>';
+	foreach (explode( ',',$options['sort']) as $name) {
+	$title='';
+		switch ( $name ) {
+			case 'field1': $title=$options['inputreference'];break;
+			case 'field2': $title=$options['quantitylabel'];break;
+			case 'field3': $title=$options['inputamount'];break;
+			case 'field4': if ($options['usestock']) $title=$options['stock'];break;
+			case 'field5': if ($options['use_options']) $title=$options['optionlabel'];break;
+			case 'field6': if ($options['usecoupon']) $title=$options['couponblurb'];break;
+			}
+		$dashboard .= '<th>'.$title.'</th>';
+		}
+	$dashboard .= '</tr>';
+	if ($messageoptions['messageorder'] == 'newest') {
+        foreach(array_reverse( $message ) as $value) {
+            if ($count < $showthismany ) {
+                if ($value['date']) $report = 'messages';
+                $content .= qpp_messagecontent ($id,$value,$options,$c);
+                $content .='</tr>';
+                $count = $count+1;
+            }
+        }
+	}
+	else {
+        foreach($message as $value) {
+		if ($count < $showthismany ) {
+            if ($value['date']) $report = 'messages';
+			$content .= $content .= qpp_messagecontent ($id,$value,$options,$c);
+			$content .='</tr>';
+			$count = $count+1;
+			}
+		}
+	}	
+	if ($report) $dashboard .= $content.'</table>';
+	else $dashboard .= '</table><p>No messages found</p>';
+	return $dashboard;
+	}
+function qpp_messagecontent ($id,$value,$options,$c) {
+	$content .= '<tr><td>'.strip_tags($value['field0']).'</td>';
+	foreach (explode( ',',$options['sort']) as $name) {
+		$title='';
+		$amount = preg_replace ( '/[^.,0-9]/', '', $value['field3']);                 
+		switch ( $name ) {
+            case 'field1': $title=$value['field1'];break;
+			case 'field2': $title=$value['field2'];break;
+			case 'field3': $title=$c['b'].$amount.$c['a'];break;
+			case 'field4': if ($options['usestock']) $title=$value['field4'];break;
+			case 'field5': if ($options['use_options']) $title=$value['field5'];break;
+			case 'field6': if ($options['usecoupon']) $title=$value['field6'];break;
+			}
+		$content .= '<td>'.$title.'</td>';
+		}
+	return $content;	
 	}
 
 function qpp_get_stored_setup () {
@@ -397,6 +529,7 @@ function qpp_get_default_setup () {
 	$qpp_setup['alternative'] = '';
 	return $qpp_setup;
 	}
+
 function qpp_get_stored_curr () {
 	$qpp_curr = get_option('qpp_curr');
 	if(!is_array($qpp_curr)) $qpp_curr = array();
@@ -409,6 +542,7 @@ function qpp_get_default_curr () {
 	$qpp_curr[''] = 'USD';
 	return $qpp_curr;
 	}
+
 function qpp_get_stored_msg () {
 	$messageoptions = get_option('qpp_messageoptions');
 	if(!is_array($messageoptions)) $messageoptions = array();
@@ -422,6 +556,7 @@ function qpp_get_default_msg () {
 	$messageoptions['messageorder'] = 'newest';
 	return $messageoptions;
 	}
+
 function qpp_get_stored_options ($id) {
 	$qpp = get_option('qpp_options'.$id);
 	if(!is_array($qpp)) $qpp = array();
@@ -473,11 +608,10 @@ function qpp_get_default_options () {
     $qpp['usecoupon'] = '';
 	$qpp['couponblurb'] = 'Enter coupon code';
 	$qpp['couponref'] = 'Coupon Applied';
-	$qpp['coupontype'] = 'couponpercent';
-	$qpp['couponpercent'] = '10';
-	$qpp['couponfixed'] = '2';
+	$qpp['couponbutton'] = 'Apply Coupon';
 	return $qpp;
 	}
+
 function qpp_get_stored_send($id) {
 	$send = get_option('qpp_send'.$id);
 	if(!is_array($send)) $send = array();
@@ -492,6 +626,7 @@ function qpp_get_default_send() {
 	$send['target'] = 'current';
 	return $send;
 	}
+
 function qpp_get_stored_style($id) {
 	$style = get_option('qpp_style'.$id);
 	if(!is_array($style)) $style = array();
@@ -526,11 +661,14 @@ function qpp_get_default_style() {
 	$style['submit-border'] = '1px solid #415063';
 	$style['submitwidth'] = 'submitpercent';
 	$style['submitposition'] = 'submitleft';
+    $style['coupon-colour'] = '#FFF';
+	$style['coupon-background'] = '#1f8416';
 	$style['styles'] = 'plugin';
 	$style['use_custom'] = '';
 	$style['custom'] = "#qpp-style {\r\n\r\n}";
 	return $style;
 	}
+
 function qpp_get_stored_error ($id) {
 	$error = get_option('qpp_error'.$id);
 	if(!is_array($error)) $error = array();
@@ -543,6 +681,7 @@ function qpp_get_default_error () {
 	$error['errorblurb'] = 'Please check the payment details';
 	return $error;
 	}
+
 function qpp_get_stored_coupon ($id) {
 	$coupon = get_option('qpp_coupon'.$id);
 	if(!is_array($coupon)) $coupon = array();
@@ -551,10 +690,10 @@ function qpp_get_stored_coupon ($id) {
 	return $coupon;
 	}
 function qpp_get_default_coupon () {
-     for ($i=1; $i<=10; $i++) {
-	$coupon['coupontype'.$i] = 'percent'.$i;
-    $coupon['couponpercent'.$i] = '10';
-	$coupon['couponfixed'.$i] = '5';
-     }
-	return $coupon;
-	}
+    for ($i=1; $i<=10; $i++) {
+        $coupon['coupontype'.$i] = 'percent'.$i;
+        $coupon['couponpercent'.$i] = '10';
+        $coupon['couponfixed'.$i] = '5';
+        }
+return $coupon;
+}
