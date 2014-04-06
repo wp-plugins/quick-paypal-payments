@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.6.2
+Version: 3.7
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -173,7 +173,7 @@ function qpp_process_form($values,$id) {
 	if (empty($send['thanksurl'])) $send['thanksurl'] = $page_url;
 	if (empty($send['cancelurl'])) $send['cancelurl'] = $page_url;
 	if ($send['target'] == 'newpage') $target = ' target="_blank" ';
-    
+    $curr = ($currency[$id] == '' ? 'USD' : $currency[$id]);
 	$check = preg_replace ( '/[^.,0-9]/', '', $values['amount']);
     $decimal = array('HKD','JPY','MYR','TWD');$d='2';
     foreach ($decimal as $item) if ($item == $currency[$id]) $d ='0';
@@ -213,7 +213,7 @@ function qpp_process_form($values,$id) {
         <input type="hidden" name="return" value="' .  $send['thanksurl'] . '">
         <input type="hidden" name="cancel_return" value="' .  $send['cancelurl'] . '">
         <input type="hidden" name="no_shipping" value="1">
-        <input type="hidden" name="currency_code" value="' .  $currency[$id] . '">
+        <input type="hidden" name="currency_code" value="' .  $curr . '">
         <input type="hidden" name="item_name_1" value="' .$qpp['inputreference'] . ': ' . strip_tags($values['reference']);
     if ($qpp['use_options']) $content .= ' - '.strip_tags($values['option1']);
     $content .= '" />';
