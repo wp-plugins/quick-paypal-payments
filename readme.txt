@@ -64,7 +64,11 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
-= 3.7 =
+= 3.6.3 =
+*	Bug fix, amounts over 1000 now work properly
+*   Added URL queries for reference, amount and coupon
+
+= 3.6.2 =
 *	Improved coupon support
 *	Option to change PayPal locale
 *	Payment records now download properly

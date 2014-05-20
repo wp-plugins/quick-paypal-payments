@@ -536,7 +536,7 @@ function qpp_error_page($id) {
 function qpp_coupon_codes($id) {
 	qpp_change_form_update();
 	if( isset( $_POST['Submit'])) {
-        $options = array('code','coupontype','couponpercent','couponfixed');
+        $options = array('code','coupontype','couponpercent','couponfixed','couponget');
         for ($i=1; $i<=10; $i++) {
         foreach ( $options as $item) $coupon[$item.$i] = stripslashes($_POST[$item.$i]);
         }
@@ -597,6 +597,9 @@ function qpp_coupon_codes($id) {
         <td><input style="margin:0; padding:0; border:none;" type="radio" name="coupontype'.$i.'" value="fixed'.$i.'" ' . $fixed.' />&nbsp;'.$b.'&nbsp;<input type="text" style="width:4em;padding:2px" label="couponfixed'.$i.'" name="couponfixed'.$i.'" value="' . $coupon['couponfixed'.$i] . '" /> '.$a.'</td></tr>';
     }
     $content .= '</table>
+    <h2>Coupon Code Autofill</h2>
+    <p>You can add coupon codes to URLs which will autofill the field. The URL format is: mysite.com/mypaymentpage/?coupon=code. The code you set will appear on the form with the following caption:<br>
+    <input id="couponget" type="text" name="couponget" value="' . $coupon['couponget'] . '" /></p>
 		<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the coupon codes?\' );"/></p>
 		</form>
 		</div>
