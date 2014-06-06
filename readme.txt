@@ -3,7 +3,7 @@
 Contributors: 
 Tags: paypal payment form
 Requires at least: 2.7
-Tested up to: 3.5.1
+Tested up to: 3.9.1
 Stable tag: trunk
 
 Zero to PayPal with just one shortcode
@@ -63,6 +63,12 @@ At the bottom of the dashboard is a link called 'Payments'.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://quick-plugins.com/quick-paypal-payments/).
 
 == Changelog ==
+
+= 3.6.4 =
+*	Add as many coupons as you like
+*   Duplicate coupons across multiple forms
+*   Set reference and amount without using shortcodes
+*   Pass form variables using queries
 
 = 3.6.3 =
 *	Bug fix, amounts over 1000 now work properly

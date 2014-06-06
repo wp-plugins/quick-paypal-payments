@@ -160,7 +160,7 @@ function qpp_setup ($id) {
 function qpp_form_options($id) {
 	qpp_change_form_update($id);
 	if( isset( $_POST['qpp_submit'])) {
-		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','couponbutton','captcha','mathscaption');
+		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','couponbutton','captcha','mathscaption','fixedreference','fixedamount');
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
 		update_option('qpp_options'.$id, $qpp);
 		qpp_admin_notice("The form and submission settings have been updated.");
@@ -206,7 +206,7 @@ function qpp_form_options($id) {
 				case 'field1': $check = '&nbsp;';
 					$type = 'Reference';
 					$input = 'inputreference';
-					$checked = 'checked';$options = '';
+					$checked = 'checked';$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedreference" ' . $qpp['fixedreference'] . ' value="checked" /> Display as a pre-set reference';
 					break;
 				case 'field2': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="use_stock" ' . $qpp['use_stock'] . ' value="checked" />';
 					$type = 'Use Item Number';
@@ -218,7 +218,8 @@ function qpp_form_options($id) {
 					break;
 				case 'field4': $check = '&nbsp;';
 					$type = 'Amount';
-					$input = 'inputamount';$checked = 'checked';$options = '';
+					$input = 'inputamount';$checked = 'checked';$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedamount" ' . $qpp['fixedamount'] . ' value="checked" /> Display as a pre-set amount';
+
 					break;
 				case 'field5': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_options" ' . $qpp['use_options'] . ' value="checked" />';
 					$type = 'Use Options';
@@ -267,8 +268,8 @@ function qpp_form_options($id) {
 		<div style="clear:left"></div></li>';
 		}
 	$content .='</ul>
-		<h2>Shortcode labels</h2>
-		<p>These are the labels that will display if you are using <a href="?page=quick-paypal-payments/settings.php&tab=shortcodes">shortcode attributes</a>.</p>
+		<h2>Fixed payment and shortcode labels</h2>
+		<p>These are the labels that will display if you are using a fixed reference or amount or <a href="?page=quick-paypal-payments/settings.php&tab=shortcodes">shortcode attributes</a>.</p>
 		<p>Label for the payment Reference/ID/Number:</p>
 		<input type="text" name="shortcodereference" value="' . $qpp['shortcodereference'] . '" />
 		<p>Label for the amount field:</p>
@@ -492,6 +493,7 @@ function qpp_send_page($id) {
 	$content .= '</div></div>';
 	echo $content;
 	}
+
 function qpp_error_page($id) {
 	qpp_change_form_update();
 	if( isset( $_POST['Submit'])) {
@@ -533,18 +535,31 @@ function qpp_error_page($id) {
 	$content .= '</div></div>';
 	echo $content;
 	}
+
 function qpp_coupon_codes($id) {
 	qpp_change_form_update();
 	if( isset( $_POST['Submit'])) {
-        $options = array('code','coupontype','couponpercent','couponfixed','couponget');
-        for ($i=1; $i<=10; $i++) {
-        foreach ( $options as $item) $coupon[$item.$i] = stripslashes($_POST[$item.$i]);
+        $coupon['couponnumber'] = stripslashes($_POST['couponnumber']);
+        $coupon['couponget'] = stripslashes($_POST['couponget']);
+        $coupon['duplicate'] = stripslashes($_POST['duplicate']);
+        $options = array('code','coupontype','couponpercent','couponfixed');
+        if ($coupon['couponnumber'] < 1) $coupon['couponnumber'] = 1;
+        for ($i=1; $i<=$coupon['couponnumber']; $i++) {
+            foreach ( $options as $item) $coupon[$item.$i] = stripslashes($_POST[$item.$i]);
+            if (!$coupon['coupontype'.$i]) $coupon['coupontype'.$i] = 'percent'.$i;
+            if (!$coupon['couponpercent'.$i]) $coupon['couponpercent'.$i] = '10';
+            if (!$coupon['couponfixed'.$i]) $coupon['couponfixed'.$i] = '5';
         }
 		update_option( 'qpp_coupon'.$id, $coupon );
+        if ($coupon['duplicate']) {
+            $qpp_setup = qpp_get_stored_setup();
+            $arr = explode(",",$qpp_setup['alternative']);
+            foreach ($arr as $item) update_option( 'qpp_coupon'.$item, $coupon );
+        }
 		qpp_admin_notice("The coupon settings have been updated.");
 		}
 	if( isset( $_POST['Reset'])) {
-		delete_option('qpp_error'.$id);
+		delete_option('qpp_coupon'.$id);
 		qpp_admin_notice("The coupon settings have been reset.");
 		}
 	$qpp_setup = qpp_get_stored_setup();
@@ -582,14 +597,15 @@ function qpp_coupon_codes($id) {
 	$coupon = qpp_get_stored_coupon($id);
     $content ='<div class="qpp-settings"><div class="qpp-options">';
 	if ($id) $content .='<h2>Coupons codes for ' . $id . '</h2>';
-	else $content .='<h2>Default form coupions codes</h2>';
+	else $content .='<h2>Default form coupons codes</h2>';
 	$content .= qpp_change_form($qpp_setup);
 	$content .= '<form method="post" action="">
 		<p<span<b>Note:</b> Leave fields blank if you don\'t want to use them</span></p>
+        <p>Number of Coupons: <input type="text" name="couponnumber" value="'.$coupon['couponnumber'].'" style="width:4em"></p>
 		<table>
         <tr><td>Coupon Code</td><td>Percentage</td><td>Fixed Amount</td></tr>
         ';
-    for ($i=1; $i<=10; $i++) {
+    for ($i=1; $i<=$coupon['couponnumber']; $i++) {
         $percent = ($coupon['coupontype'.$i] == 'percent'.$i ? 'checked' : '');
         $fixed = ($coupon['coupontype'.$i] == 'fixed'.$i ? 'checked' : ''); 
         $content .= '<tr><td><input type="text" name="code'.$i.'" value="' . $coupon['code'.$i] . '" /></td>
@@ -600,13 +616,15 @@ function qpp_coupon_codes($id) {
     <h2>Coupon Code Autofill</h2>
     <p>You can add coupon codes to URLs which will autofill the field. The URL format is: mysite.com/mypaymentpage/?coupon=code. The code you set will appear on the form with the following caption:<br>
     <input id="couponget" type="text" name="couponget" value="' . $coupon['couponget'] . '" /></p>
-		<p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the coupon codes?\' );"/></p>
-		</form>
-		</div>
-		<div class="qpp-options" style="float:right;">
-		<h2>Coupon Check</h2>
-		<p>Test your coupon codes.</p>
-        <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+    <h2>Clone Coupon Settings</h2>
+    <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="duplicate" ' . $coupon['duplicate'] . ' value="checked" /> Duplicate coupon codes across all forms</p>
+    <p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the coupon codes?\' );"/></p>
+    </form>
+    </div>
+    <div class="qpp-options" style="float:right;">
+    <h2>Coupon Check</h2>
+    <p>Test your coupon codes.</p>
+    <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
 	$args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
     $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="24 Roses" amount="£100"]</code>.</p>';
@@ -615,6 +633,7 @@ function qpp_coupon_codes($id) {
     $content .= '</div></div>';
 	echo $content;
 	}
+
 function qpp_shortcodes() {
 	$content ='<div class="qpp-settings"><div class="qpp-options">
 		<h2>Simple Shortcodes</h2>

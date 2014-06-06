@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.6.3
+Version: 3.6.4
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -86,12 +86,16 @@ function qpp_display_form( $values, $errors, $id ) {
 	foreach (explode( ',',$qpp['sort']) as $name) {
 		switch ( $name ) {
 			case 'field1':
-				if (empty($values['id'])) $content .= '<p><input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/></p>';
+				if (empty($values['id'])) 
+                    $content .= '<p>
+                    <input type="text" label="Reference" name="reference" value="' . $values['reference'] . '" onfocus="qppclear(this, \'' . $values['reference'] . '\')" onblur="qpprecall(this, \'' . $values['reference'] . '\')"/>
+                    </p>';
 				else {
 					if ($values['explode']) {
 						$checked = 'checked';$ref = explode(",",$values['reference']);
 						$content .= '<p class="payment" >'.$qpp['shortcodereference'].'<br>';
-						foreach ($ref as $item) { $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="reference" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';$checked='';}
+						foreach ($ref as $item)
+                            $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="reference" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';$checked='';
 						$content .= '</p>';}
 					else $content .= '<p class="input" >'.$values['reference'].'</p><input type="hidden" name="id" value="' . $values['id'] . '" />';
 					}
@@ -292,13 +296,14 @@ function qpp_loop($atts) {
         $shortcodereference = $qpp['shortcodereference'].' ';
         $shortcodeamount = $qpp['shortcodeamount'].' ';
         }
-    
     if ($id) {
 		$formvalues['id'] = 'checked';
 		if (strrpos($id,',')) {$formvalues['reference'] = $id;$formvalues['explode'] = 'checked';}
 		else $formvalues['reference'] = $shortcodereference.$id;
 		}
 	else {$formvalues['reference'] = $qpp['inputreference'];$formvalues['id'] = '';}
+    if ($qpp['fixedreference'] && !$id) {$formvalues['reference'] = $shortcodereference.$qpp['inputreference'];$formvalues['id'] = 'checked';}
+
 	
     if ($amount) {
         $formvalues['pay'] = 'checked';
@@ -306,7 +311,9 @@ function qpp_loop($atts) {
         else $formvalues['amount'] = $shortcodeamount.$amount;
         }
 	else {$formvalues['amount'] = $qpp['inputamount'];$formvalues['pay'] = '';}
-    
+    if ($qpp['fixedamount'] && !$amount) {$formvalues['amount'] = $shortcodeamount.$qpp['inputamount'];$formvalues['pay'] = 'checked';}
+
+
     if (isset($_POST['qppapply'.$form]) || isset($_POST['qppsubmit'.$form]) || isset($_POST['qppsubmit'.$form.'_x'])) {
         $_POST = qpp_sanitize($_POST);
         if (isset($_POST['reference'])) $id = $_POST['reference'];
@@ -319,7 +326,7 @@ function qpp_loop($atts) {
     	$check = preg_replace ( '/[^.,0-9]/', '', $formvalues['amount']); 
             $coupon = qpp_get_stored_coupon($form);
             $c = qpp_currency ($form);
-            for ($i=1; $i<=10; $i++) {
+            for ($i=1; $i<=$coupon['couponnumber']; $i++) {
                 if ($formvalues['couponblurb'] == $coupon['code'.$i]) {
                     if ($coupon['coupontype'.$i] == 'percent'.$i) $check = $check - ($check * $coupon['couponpercent'.$i]/100);
                     if ($coupon['coupontype'.$i] == 'fixed'.$i) $check = $check - $coupon['couponfixed'.$i];
@@ -350,7 +357,8 @@ function qpp_loop($atts) {
 		$formvalues['thesum'] = "$digit1 - $digit2";
 		$formvalues['answer'] = $digit1 - $digit2;
 		}
-        qpp_display_form($formvalues,'',$form);
+      
+ qpp_display_form($formvalues,'',$form);
 		}
 	$output_string=ob_get_contents();
 	ob_end_clean();
@@ -704,5 +712,6 @@ function qpp_get_default_coupon () {
         $coupon['couponpercent'.$i] = '10';
         $coupon['couponfixed'.$i] = '5';
         }
+    $coupon['couponnumber'] = '10';
 return $coupon;
 }
