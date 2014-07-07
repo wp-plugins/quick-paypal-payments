@@ -64,15 +64,21 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.7 =
+*	Better error reporting
+*	Option to link to Terms and Conditions
+*	Set maximum quantity
+*	CSS fix to overide theme settings for line heights
+
 = 3.6.4 =
 *	Add as many coupons as you like
-*   Duplicate coupons across multiple forms
-*   Set reference and amount without using shortcodes
-*   Pass form variables using queries
+*	Duplicate coupons across multiple forms
+*	Set reference and amount without using shortcodes
+*	Pass form variables using queries
 
 = 3.6.3 =
 *	Bug fix, amounts over 1000 now work properly
-*   Added URL queries for reference, amount and coupon
+*	Added URL queries for reference, amount and coupon
 
 = 3.6.2 =
 *	Improved coupon support

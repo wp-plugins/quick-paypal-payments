@@ -8,6 +8,7 @@ function qpp_settings_init() {
 	qpp_generate_csv();
 	return;
 	}
+
 function qpp_scripts_init() {
 	wp_enqueue_script('jquery-ui-sortable');
 	wp_enqueue_style( 'wp-color-picker' );
@@ -24,12 +25,15 @@ add_action('admin_enqueue_scripts', 'qpp_scripts_init');
 function qpp_page_init() {
 	add_options_page('Paypal Payments', 'Paypal Payments', 'manage_options', __FILE__, 'qpp_tabbed_page');
 	}
+
 function qpp_admin_notice($message) {
 	if (!empty( $message)) echo '<div class="updated"><p>'.$message.'</p></div>';
 	}
+
 function qpp_admin_pages() {
 	add_menu_page('Payments', 'Payments', 'manage_options','quick-paypal-payments/quick-paypal-messages.php');
 	}
+
 function qpp_admin_tabs($current = 'settings') { 
 	$tabs = array( 'setup' => 'Setup' , 'settings' => 'Form Settings', 'styles' => 'Styling' , 'send' => 'Send Options' , 'error' => 'Error Messages' , 'shortcodes' => 'Shortcodes' ,); 
 	$links = array();  
@@ -41,6 +45,7 @@ function qpp_admin_tabs($current = 'settings') {
 		}
 	echo '</h2>';
 	}
+
 function qpp_tabbed_page() {
 	$qpp_setup = qpp_get_stored_setup();
 	$id=$qpp_setup['current'];
@@ -60,6 +65,7 @@ function qpp_tabbed_page() {
 		}
 	echo '</div>';
 	}
+
 function qpp_setup ($id) {
 	$qpp_setup = qpp_get_stored_setup();
 	if( isset( $_POST['Submit'])) {
@@ -157,10 +163,11 @@ function qpp_setup ($id) {
 		$content .= '</div></div>';
 	echo $content;
 	}
+
 function qpp_form_options($id) {
 	qpp_change_form_update($id);
 	if( isset( $_POST['qpp_submit'])) {
-		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','couponbutton','captcha','mathscaption','fixedreference','fixedamount');
+		$options = array('title','blurb','sort','inputreference','inputamount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','couponbutton','captcha','mathscaption','fixedreference','fixedamount','useterms','termsblurb','termsurl','termspage','quantitymax','quantitymaxblurb');
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
 		update_option('qpp_options'.$id, $qpp);
 		qpp_admin_notice("The form and submission settings have been updated.");
@@ -214,7 +221,8 @@ function qpp_form_options($id) {
 					break;
 				case 'field3': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_quantity" ' . $qpp['use_quantity'] . ' value="checked" />';
 					$type = 'Use Quantity';
-					$input = 'quantitylabel';$checked = $qpp['use_quantity'];$options = '';
+					$input = 'quantitylabel';$checked = $qpp['use_quantity'];$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="quantitymax" ' . $qpp['quantitymax'] . ' value="checked" /> Display and validate a maximumum quantity<br><span class="description">Message that will display on the form:</span><br>
+						<input type="text" name="quantitymaxblurb" value="' . $qpp['quantitymaxblurb'] . '" />';
 					break;
 				case 'field4': $check = '&nbsp;';
 					$type = 'Amount';
@@ -246,7 +254,7 @@ function qpp_form_options($id) {
 					break;
                 case 'field8': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="captcha" ' . $qpp['captcha'] . ' value="checked" />';
 					$type = 'Maths Captcha';
-					$input = 'mathscaption';$checked = $qpp['captcha'];$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</spam>';
+					$input = 'mathscaption';$checked = $qpp['captcha'];$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</span>';
 					break;
                 case 'field9': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usecoupon" ' . $qpp['usecoupon'] . ' value="checked" />';
 					$type = 'Coupon Code';
@@ -257,6 +265,16 @@ function qpp_form_options($id) {
 						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" /><br>
                         <a href="?page=quick-paypal-payments/settings.php&tab=coupon">Set coupon codes</a>'; 
 					break;
+case 'field10': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useterms" ' . $qpp['useterms'] . ' value="checked" />';
+					$type = 'Terms and Conditions';
+					$input = 'termsblurb';$checked = $qpp['termsblurb'];
+					$options = '<span class="description">URL of Terms and Conditions:</span><br>
+						<input type="text" name="termsurl" value="' . $qpp['termsurl'] . '" /><br>
+                        <input type="checkbox" style="margin:0; padding: 0; border: none" name="termspage" ' . $qpp['termspage'] . ' value="checked" /> Open link in a new page';
+
+ 
+					break;
+
 		}
 	$li_class = ( $checked) ? 'button_active' : 'button_inactive';	
 	$content .='<li class="'.$li_class.'" id="'.$name.'">
@@ -288,11 +306,12 @@ function qpp_form_options($id) {
 		</div>
 		<div class="qpp-options" style="float:right;">
 		<h2>Form Preview</h2>
-		<p>Note: The preview form uses the wordpress admin styles. Your form will use the theme styles so won\'t look exactly like the one below.</p>
-         <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+		<p>Note: The preview form uses the wordpress admin styles. Your form will use the theme styles so won\'t look exactly like the one below.</p>';
+    if ($id) $form=' form="'.$id.'"';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.']</code>.</p>';
 	$args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
-    $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="Green,Blue,Red" amount="£100"]</code>.</p>';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.' id="Green,Blue,Red" amount="£100"]</code>.</p>';
     $args = array('form' => $id, 'id' => 'Green,Blue,Red', 'amount' => '£100');
     $content .= qpp_loop($args);
 	$content .= '</div></div>';
@@ -395,11 +414,12 @@ function qpp_styles($id) {
 		</form>
 		</div>
 		<div class="qpp-options" style="float:right;"> <h2>Test Form</h2>
-		<p>Not all of your style selections will display here (because of how WordPress works). So check the form on your site.</p>
-        <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+		<p>Not all of your style selections will display here (because of how WordPress works). So check the form on your site.</p>';
+    if ($id) $form=' form="'.$id.'"';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.']</code>.</p>';
     $args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
-    $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="A Teddy Bear" amount="£100"]</code>.</p>';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.' id="A Teddy Bear" amount="£100"]</code>.</p>';
     $args = array('form' => $id, 'id' => 'A Teddy Bear', 'amount' => '£100');
 	$content .= qpp_loop($args);
 	$content .= '</div></div>';
@@ -483,11 +503,12 @@ function qpp_send_page($id) {
 		</form>
 		</div>
 		<div class="qpp-options" style="float:right;"> <h2>Form Preview</h2>
-		<p>Note: The preview form uses the wordpress admin styles. Your form will use the theme styles so won\'t look exactly like the one below.</p>
-        <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+		<p>Note: The preview form uses the wordpress admin styles. Your form will use the theme styles so won\'t look exactly like the one below.</p>';
+        if ($id) $form=' form="'.$id.'"';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.']</code>.</p>';
     $args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
-    $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="An Elephant" amount="$10,$20,$30"]</code>.</p>';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.' id="An Elephant" amount="$10,$20,$30"]</code>.</p>';
     $args = array('form' => $id, 'id' => 'An Elephant', 'amount' => '$10,$20,$30');
 	$content .= qpp_loop($args);
 	$content .= '</div></div>';
@@ -525,11 +546,12 @@ function qpp_error_page($id) {
 		</div>
 		<div class="qpp-options" style="float:right;">
 		<h2>Error Checker</h2>
-		<p>Try sending a blank form to test your error messages.</p>
-        <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+		<p>Try sending a blank form to test your error messages.</p>';
+    if ($id) $form=' form="'.$id.'"';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.']</code>.</p>';
 	$args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
-    $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="An Elephant" amount="£100"]</code>.</p>';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.' id="Flange Adjuster" amount="£100"]</code>.</p>';
     $args = array('form' => $id, 'id' => 'An Elephant', 'amount' => '£100');
     $content .= qpp_loop($args);
 	$content .= '</div></div>';
@@ -623,11 +645,12 @@ function qpp_coupon_codes($id) {
     </div>
     <div class="qpp-options" style="float:right;">
     <h2>Coupon Check</h2>
-    <p>Test your coupon codes.</p>
-    <p>Example Shortcode: <code>[qpp form="'.$id.'"]</code>.</p>';
+    <p>Test your coupon codes.</p>';
+    if ($id) $form=' form="'.$id.'"';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.']</code>.</p>';
 	$args = array('form' => $id, 'id' => '', 'amount' => '');
 	$content .= qpp_loop($args);
-    $content .= '<p>Example Shortcode: <code>[qpp form="'.$id.'" id="24 Roses" amount="£100"]</code>.</p>';
+    $content .= '<p>Example Shortcode: <code>[qpp'.$form.' id="24 Roses" amount="£100"]</code>.</p>';
     $args = array('form' => $id, 'id' => '24 Roses', 'amount' => '£100');
 	$content .= qpp_loop($args);
     $content .= '</div></div>';
@@ -752,6 +775,7 @@ function donate_verify($formvalues) {
 	if ($formvalues['yourname'] == 'Your name' || empty($formvalues['yourname'])) $errors = 'second';
 	return $errors;
 	}
+
 function donate_display( $values, $errors ) {
 	$content = "<script>\r\t
 	function donateclear(thisfield, defaulttext) {if (thisfield.value == defaulttext) {thisfield.value = '';}}\r\t
@@ -770,6 +794,7 @@ function donate_display( $values, $errors ) {
 	</form></div>';
 	echo $content;
 	}
+
 function donate_process($values) {
 	$page_url = donate_page_url();
 	$content = '<h2>Waiting for paypal...</h2><form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="frmCart" id="frmCart">
@@ -788,6 +813,7 @@ function donate_process($values) {
 	</script>';
 	echo $content;
 	}
+
 function donate_page_url() {
 	$pageURL = 'http';
 	if( isset($_SERVER["HTTPS"]) ) { if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";} }
@@ -796,6 +822,7 @@ function donate_page_url() {
 	else $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 	return $pageURL;
 	}
+
 function donate_loop() {
 	ob_start();
 	if (isset($_POST['donate'])) {
