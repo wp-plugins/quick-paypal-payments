@@ -1,9 +1,10 @@
+
 === Quick Paypal Payments ===
 
 Contributors: 
 Tags: paypal payment form
 Requires at least: 2.7
-Tested up to: 3.9.1
+Tested up to: 3.9.2
 Stable tag: trunk
 
 Zero to PayPal with just one shortcode
@@ -63,6 +64,10 @@ At the bottom of the dashboard is a link called 'Payments'.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://quick-plugins.com/quick-paypal-payments/).
 
 == Changelog ==
+
+= 3.7.1 =
+*   Minor bug fixes
+*   Added enhanced ID and Amount options
 
 = 3.7 =
 *	Better error reporting

@@ -4,7 +4,7 @@
 .qpp-options p span{font-weight:bold;}
 .qpp-options h2 {color: #005F6B;}
 .qpp-options h3 {color: #717DD7;margin: 4px 0 0 0;padding: 0;}
-.qpp-options input[type=text], .qpp-options textarea, .qpp-options select, .qpp-options #submit {margin: 2px 0 2px 0;padding: 2px;color: #465069;font-size: 100%;border:1px solid #415063;width:100%;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box;height:auto}
+.qpp-options input[type=text], .qpp-options textarea, .qpp-options select {margin: 2px 0 2px 0;padding: 2px;color: #465069;font-size: 100%;border:1px solid #415063;width:100%;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box;height:auto}
 .qpp-options input#submit {background: #343838;color: #FFF;}
 .qpp-options ul {margin: 0;padding: 0;}
 .qpp-options table {width:100%;}
