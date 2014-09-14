@@ -6,7 +6,7 @@ Requires at least: 2.7
 Tested up to: 4.0
 Stable tag: trunk
 
-Zero to PayPal with just one shortcode
+Zero to PayPal with just one shortcode. Jam packed with features and options with easy to use custom settings.
 
 == Description ==
 
@@ -63,6 +63,11 @@ At the bottom of the dashboard is a link called 'Payments'.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://quick-plugins.com/quick-paypal-payments/).
 
 == Changelog ==
+
+= 3.8 =
+*	Added field for recurring payment
+*   Added code to allow multiple products/prices
+*   More shortcode options
 
 = 3.7 =
 *	Better error reporting

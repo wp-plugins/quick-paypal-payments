@@ -12,6 +12,11 @@
 .qpp-style img {width:100%;height:auto;overflow:hidden;}
 .qpp-style input#submit {color: #FFF;background: #343838;text-align: center;cursor: pointer;}
 .qpp-style input#submitcoupon {color: #FFF;background: #1f8416;text-align: center;cursor: pointer;margin:5px 0 7px 0;padding:6px;border:1px solid #415063;width:100%;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box;font-size:inherit;}
+span .floatleft{float:left;}
+span .floatleft.input {;padding-top:5px;}
+span .floatright {float:right;text-align:right;margin-bottom:4px;}
+span .floatright input {width:3em;text-align:right;}
+#total_price {width:8em;border:none}
 
 #qpp-widget table {margin-bottom: 10px;}
 #qpp-widget td {border-top: 1px solid #005F6B;padding: 5px 10px 5px 0;max-width: 400px;vertical-align:top;}

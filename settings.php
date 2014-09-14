@@ -19,21 +19,30 @@ function qpp_scripts_init() {
 	wp_enqueue_media();
 	wp_enqueue_script('qpp-media', plugins_url('quick-paypal-media.js', __FILE__ ), array( 'jquery' ), false, true );
 	}
+
 add_action('admin_enqueue_scripts', 'qpp_scripts_init');
 
 function qpp_page_init() {
 	add_options_page('Paypal Payments', 'Paypal Payments', 'manage_options', __FILE__, 'qpp_tabbed_page');
 	}
+
 function qpp_admin_notice($message) {
 	if (!empty( $message)) echo '<div class="updated"><p>'.$message.'</p></div>';
 	}
+
 function qpp_admin_pages() {
 	add_menu_page('Payments', 'Payments', 'manage_options','quick-paypal-payments/quick-paypal-messages.php');
 	}
+
 function qpp_admin_tabs($current = 'settings') { 
-	$tabs = array( 'setup' => 'Setup' , 'settings' => 'Form Settings', 'styles' => 'Styling' , 'send' => 'Send Options' , 'error' => 'Error Messages' , 'shortcodes' => 'Shortcodes' ,); 
+	$tabs = array('setup' => 'Setup',
+                  'settings' => 'Form Settings',
+                  'styles' => 'Styling',
+                  'send' => 'Send Options',
+                  'error' => 'Error Messages',
+                  'shortcodes' => 'Shortcodes',
+                 ); 
 	$links = array();  
-	echo '';
 	echo '<h2 class="nav-tab-wrapper">';
 	foreach( $tabs as $tab => $name ) {
 		$class = ( $tab == $current ) ? ' nav-tab-active' : '';
@@ -150,57 +159,123 @@ $content .= '</div>
 		<p><a href="?page=quick-paypal-payments/settings.php&tab=reply">Send Options</a>. Change the thank you message and how the form is sent.</p>
 		<p><a href="?page=quick-paypal-payments/settings.php&tab=styles">Styling</a> Change fonts, colours, borders, images and submit button.</p>
 		<p><a href="?page=quick-paypal-payments/settings.php&tab=error">Error Messages</a>. Change the error message.</p>
-<p><a href="?page=quick-paypal-payments/settings.php&tab=shortcodes">Shortcodes</a>. Examples of how to use shortcodes.</p>
-
-<h2>Payment Records</h2>		
-<p>To see all your payment messages click on the <b>Payments</b> link in the dashboard menu or <a href="?page=quick-paypal-payments/quick-paypal-messages.php">click here</a>.</p>
-<p>If you want to display a list of all the payments on a post or page use the shortcode <code>[qppreport form="name"]</code>.</p>
+        <p><a href="?page=quick-paypal-payments/settings.php&tab=shortcodes">Shortcodes</a>. Examples of how to use shortcodes.</p>
+        <h2>Payment Records</h2>
+        <p>To see all your payment messages click on the <b>Payments</b> link in the dashboard menu or <a href="?page=quick-paypal-payments/quick-paypal-messages.php">click here</a>.</p>
+        <p>If you want to display a list of all the payments on a post or page use the shortcode <code>[qppreport form="name"]</code>.</p>
 		<p>If you have any questions visit the <a href="http://quick-plugins.com/quick-paypal-payments/">plugin page</a> or email me at <a href="mailto:mail@quick-plugins.com">mail@quick-plugins.com</a>.</p>
-<h2>All the Shortcodes</h2>
-<table>
-<tbody>
+        <h2>All the Shortcodes</h2>
+        <table>
+        <tbody>
+        <tr>
+        <td>[qpp]</td>
+        <td>Standard paypal plugin</td>
+        </tr>
+        <tr>
+        <td>[qpp form="name"]</td>
+        <td>Uses a named form (created on the setup page)</td>
+        </tr>
+        <tr>
+        <td>[qpp id="your name"]</td>
+        <td>Presets the reference field to the words \'your name\'</td>
+        </tr>
+        <tr>
+        <td>[qpp amount="$30"]</td>
+        <td>Sets the amount to pay to "$30"</td>
+        </tr>
+        <tr>
+        <td>[qpp labels="off"]</td>
+        <td>Don\'t show labels for preset fields</td>
+        </tr>
+        <tr>
+        <td>[qpp id="red,blue,green"]</td>
+        <td>Displays options instead of a single reference/ID</td>
+        </tr>
+        <tr>
+        <td>[qpp amount="$10,$20,$50"]</td>
+        <td>Displays a list of amounts</td>
+        </tr>
 <tr>
-<td>[qpp]</td>
-<td>Standard paypal plugin</td>
-</tr>
-<tr>
-<td>[qpp form="name"]</td>
-<td>Uses a named form (created on the setup page)</td>
-</tr>
-<tr>
-<td>[qpp id="your name"]</td>
-<td>Presets the reference field to the words \'your name\'</td>
-</tr>
-<tr>
-<td>[qpp amount="$30"]</td>
-<td>Sets the amount to pay to "$30"</td>
-</tr>
-<tr>
-<td>[qpp labels="off"]</td>
-<td>Don\'t show labels for preset fields</td>
-</tr>
-<tr>
-<td>[qpp id="red,blue,green"]</td>
-<td>Displays options instead of a single reference/ID</td>
-</tr>
-<tr>
-<td>[qpp amount="$10,$20,$50"]</td>
-<td>Displays a list of amounts</td>
-</tr>
-<tr>
-<td>[qppreport form="name"]</td>
-<td>Displays a table of all payments made from the form called \'name\'</td>
-</tr>
-</tbody>
-</table></div></div>';
+        <td>[qpp id="Red;$10,Blue;$20,Green;$50"]</td>
+        <td>Combines reference and amount (note position of semicolons)</td>
+        </tr>
+
+        <tr>
+        <td>[qppreport form="name"]</td>
+        <td>Displays a table of all payments made from the form called \'name\'</td>
+        </tr>
+        </tbody>
+        </table></div></div>';
 	echo $content;
 	}
 
 function qpp_form_options($id) {
 	qpp_change_form_update($id);
 	if( isset( $_POST['qpp_submit'])) {
-		$options = array('title','blurb','sort','inputreference','inputamount','allow_amount','shortcodereference','use_quantity','quantitylabel','use_stock','stocklabel','use_options','optionlabel','optionvalues','shortcodeamount','shortcode_labels','submitcaption','cancelurl,','thanksurl','target','paypal-url','paypal-location','useprocess','processblurb','processref','processtype','processpercent','processfixed','usepostage','postageblurb','postageref','postagetype','postagepercent','postagefixed','usecoupon','couponblurb','couponref','couponbutton','captcha','mathscaption','fixedreference','fixedamount','useterms','termsblurb','termsurl','termspage','quantitymax','quantitymaxblurb');
+		$options = array('title',
+                         'blurb',
+                         'sort',
+                         'inputreference',
+                         'inputamount',
+                         'allow_amount',
+                         'shortcodereference',
+                         'use_quantity',
+                         'quantitylabel',
+                         'use_stock',
+                         'stocklabel',
+                         'use_options',
+                         'optionlabel',
+                         'optionvalues',
+                         'shortcodeamount',
+                         'shortcode_labels',
+                         'submitcaption',
+                         'cancelurl,',
+                         'thanksurl',
+                         'target',
+                         'paypal-url',
+                         'paypal-location',
+                         'useprocess',
+                         'processblurb',
+                         'processref',
+                         'processtype',
+                         'processpercent',
+                         'processfixed',
+                         'usepostage',
+                         'postageblurb',
+                         'postageref',
+                         'postagetype',
+                         'postagepercent',
+                         'postagefixed',
+                         'usecoupon',
+                         'couponblurb',
+                         'couponref',
+                         'couponbutton',
+                         'captcha',
+                         'mathscaption',
+                         'fixedreference',
+                         'fixedamount',
+                         'useterms',
+                         'useblurb',
+                         'extrablurb',
+                         'userecurring',
+                         'recurringblurb',
+                         'recurring',
+                         'Dvalue',
+                         'Wvalue',
+                         'Mvalue',
+                         'Yvalue',
+                         'termsblurb',
+                         'termsurl',
+                         'termspage',
+                         'quantitymax',
+                         'quantitymaxblurb','combine',
+                        );
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
+        $ref = $qpp['recurring'].'value';
+        $qpp['recurringhowmany'] = $_POST[$ref];
+        $ref = $qpp['recurring'].'period';
+        $qpp['recurringperiod'] = $_POST[$ref];
+        if ($qpp['userecurring']) {$qpp['use_quantity']='';$qpp['usepostage']='';$qpp['']='';$qpp['useprocess']='';$qpp['use_stock']='';}
 		update_option('qpp_options'.$id, $qpp);
 		qpp_admin_notice("The form and submission settings have been updated.");
 		}
@@ -216,6 +291,7 @@ function qpp_form_options($id) {
 	$$qpp['processtype'] = 'checked';
 	$$qpp['postagetype'] = 'checked';
     $$qpp['coupontype'] = 'checked';
+     $$qpp['recurring'] = 'checked';
 	$content = '<script>
 		jQuery(function() {
 			var qpp_sort = jQuery( "#qpp_sort" ).sortable({ axis: "y" ,
@@ -242,73 +318,112 @@ function qpp_form_options($id) {
 		<ul id="qpp_sort">';
 		foreach (explode( ',',$qpp['sort']) as $name) {
 			switch ( $name ) {
-				case 'field1': $check = '&nbsp;';
-					$type = 'Reference';
-					$input = 'inputreference';
-					$checked = 'checked';$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedreference" ' . $qpp['fixedreference'] . ' value="checked" /> Display as a pre-set reference<br><span class="description">Use commas to seperate options</span>.';
+                case 'field1':
+                $check = '&nbsp;';
+                $type = 'Reference';
+                $input = 'inputreference';
+                $checked = 'checked';
+                $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedreference" ' . $qpp['fixedreference'] . ' value="checked" /> Display as a pre-set reference<br><span class="description">Use commas to seperate options: Red,Green, Blue<br>Use semi-colons to combine with amount: Red;$5,Green;$10,Blue;£20</span>';
+                break;
+				case 'field2': 
+                $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="use_stock" ' . $qpp['use_stock'] . ' value="checked" />';
+                $type = 'Use Item Number';
+                $input = 'stocklabel';
+                $checked = $qpp['use_stock'];
+                $options = '';
+                break;
+				case 'field3': 
+                $check = ($qpp['userecurring'] ? '&nbsp;' :'<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_quantity" ' . $qpp['use_quantity'] . ' value="checked" />');
+                $type = 'Use Quantity';
+                $input = 'quantitylabel';
+                $checked = $qpp['use_quantity'];
+                $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="quantitymax" ' . $qpp['quantitymax'] . ' value="checked" /> Display and validate a maximum quantity<br><span class="description">Message that will display on the form:</span><br>
+				<input type="text" name="quantitymaxblurb" value="' . $qpp['quantitymaxblurb'] . '" />';
 					break;
-				case 'field2': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="use_stock" ' . $qpp['use_stock'] . ' value="checked" />';
-					$type = 'Use Item Number';
-					$input = 'stocklabel';$checked = $qpp['use_stock'];$options = '';
-					break;
-				case 'field3': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_quantity" ' . $qpp['use_quantity'] . ' value="checked" />';
-					$type = 'Use Quantity';
-					$input = 'quantitylabel';$checked = $qpp['use_quantity'];$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="quantitymax" ' . $qpp['quantitymax'] . ' value="checked" /> Display and validate a maximum quantity<br><span class="description">Message that will display on the form:</span><br>
-						<input type="text" name="quantitymaxblurb" value="' . $qpp['quantitymaxblurb'] . '" />';
-					break;
-				case 'field4': $check = '&nbsp;';
-					$type = 'Amount';
-					$input = 'inputamount';$checked = 'checked';$options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedamount" ' . $qpp['fixedamount'] . ' value="checked" /> Display as a pre-set amount<br><span class="description">Use commas to create an options list</span><br><input type="checkbox" style="margin:0; padding: 0; border: none" name="allow_amount" ' . $qpp['allow_amount'] . ' value="checked" /> Do not validate (use default amount value)';
-
-					break;
-				case 'field5': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_options" ' . $qpp['use_options'] . ' value="checked" />';
-					$type = 'Use Options';
-					$input = 'optionlabel';$checked = $qpp['use_options'];
-					$options = '<span class="description">Options (separate with a comma):</span><br><textarea  name="optionvalues" label="Radio" rows="2">' . $qpp['optionvalues'] . '</textarea>'; 
-					break;
-				case 'field6': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usepostage" ' . $qpp['usepostage'] . ' value="checked" />';
-					$type = ' Add postal charge';
-					$input = 'postageblurb';$checked = $qpp['usepostage'];
-					$options = '<span class="description">Post and Packing charge type:</span><br>
+				case 'field4': 
+                $check = '&nbsp;';
+                $type = 'Amount';
+                $input = 'inputamount';
+                $checked = 'checked';
+                $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedamount" ' . $qpp['fixedamount'] . ' value="checked" /> Display as a pre-set amount<br><span class="description">Use commas to create an options list</span><br><input type="checkbox" style="margin:0; padding: 0; border: none" name="allow_amount" ' . $qpp['allow_amount'] . ' value="checked" /> Do not validate (use default amount value)';
+                break;
+				case 'field5': 
+                $check = $qpp['userecurring'] ? '&nbsp;' : '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_options" ' . $qpp['use_options'] . ' value="checked" />';
+                $type = 'Use Options';
+                $input = 'optionlabel';
+                $checked = $qpp['use_options'];
+                $options = '<span class="description">Options (separate with a comma):</span><br><textarea  name="optionvalues" label="Radio" rows="2">' . $qpp['optionvalues'] . '</textarea>'; 
+                break;
+				case 'field6': 
+                $check = $qpp['userecurring'] ? '&nbsp;' : '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usepostage" ' . $qpp['usepostage'] . ' value="checked" />';
+                $type = ' Add postal charge';
+                $input = 'postageblurb';
+                $checked = $qpp['usepostage'];
+                $options = '<span class="description">Post and Packing charge type:</span><br>
 				<input style="margin:0; padding:0; border:none;" type="radio" name="postagetype" value="postagepercent" ' . $postagepercent . ' /> Percentage of the total: <input type="text" style="width:4em;padding:2px" label="postagepercent" name="postagepercent" value="' . $qpp['postagepercent'] . '" /> %<br>
-						<input style="margin:0; padding:0; border:none;" type="radio" name="postagetype" value="postagefixed" ' . $postagefixed . ' /> Fixed amount: <input type="text" style="width:4em;padding:2px" label="postagefixed" name="postagefixed" value="' . $qpp['postagefixed'] . '" /> '.$currency[$id].'<br>
-						<span class="description">Post and Packing reference (appears on the PayPal payment):</span><br>
-						<input type="text" name="postageref" value="' . $qpp['postageref'] . '" />'; 
-					break;
-				case 'field7': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useprocess" ' . $qpp['useprocess'] . ' value="checked" />';
-					$type = 'Processing Charge';
-					$input = 'processblurb';$checked = $qpp['useprocess'];
-					$options = '<span class="description">Payment charge type:</span><br>
+                <input style="margin:0; padding:0; border:none;" type="radio" name="postagetype" value="postagefixed" ' . $postagefixed . ' /> Fixed amount: <input type="text" style="width:4em;padding:2px" label="postagefixed" name="postagefixed" value="' . $qpp['postagefixed'] . '" /> '.$currency[$id].'<br>
+                <span class="description">Post and Packing reference (appears on the PayPal payment):</span><br>
+                <input type="text" name="postageref" value="' . $qpp['postageref'] . '" />'; 
+                break;
+				case 'field7': 
+                $check = $qpp['userecurring'] ? '&nbsp;' : '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useprocess" ' . $qpp['useprocess'] . ' value="checked" />';
+                $type = 'Processing Charge';
+                $input = 'processblurb';
+                $checked = $qpp['useprocess'];
+                $options = '<span class="description">Payment charge type:</span><br>
 						<input style="margin:0; padding:0; border:none;" type="radio" name="processtype" value="processpercent" ' . $processpercent . ' /> Percentage of the total: <input type="text" style="width:4em;padding:2px" label="processpercent" name="processpercent" value="' . $qpp['processpercent'] . '" /> %<br>
 						<input style="margin:0; padding:0; border:none;" type="radio" name="processtype" value="processfixed" ' . $processfixed . ' /> Fixed amount: <input type="text" style="width:4em;padding:2px" label="processfixed" name="processfixed" value="' . $qpp['processfixed'] . '" /> '.$currency[$id].'<br>
 <span class="description">Processing reference (appears on the PayPal payment):</span><br>
 						<input type="text" name="processref" value="' . $qpp['processref'] . '" />'; 
-					break;
-                case 'field8': $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="captcha" ' . $qpp['captcha'] . ' value="checked" />';
-					$type = 'Maths Captcha';
-					$input = 'mathscaption';$checked = $qpp['captcha'];$options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</span>';
-					break;
-                case 'field9': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usecoupon" ' . $qpp['usecoupon'] . ' value="checked" />';
-					$type = 'Coupon Code';
-					$input = 'couponblurb';$checked = $qpp['usecoupon'];
-					$options = '<span class="description">Button label:</span><br>
+                break;
+                case 'field8': 
+                $check = '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="captcha" ' . $qpp['captcha'] . ' value="checked" />';
+                $type = 'Maths Captcha';
+                $input = 'mathscaption';
+                $checked = $qpp['captcha'];
+                $options = '<span class="description">Add a maths checker to the form to (hopefully) block most of the spambots.</span>';
+                break;
+                case 'field9': 
+                $check = $qpp['userecurring'] ? '&nbsp;' : '<input type="checkbox" style="margin:0; padding: 0; border: none" name="usecoupon" ' . $qpp['usecoupon'] . ' value="checked" />';
+                $type = 'Coupon Code';
+                $input = 'couponblurb';$checked = $qpp['usecoupon'];
+                $options = '<span class="description">Button label:</span><br>
 						<input type="text" name="couponbutton" value="' . $qpp['couponbutton'] . '" /><br>
                         <span class="description">Coupon applied message:</span><br>
 						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" /><br>
                         <a href="?page=quick-paypal-payments/settings.php&tab=coupon">Set coupon codes</a>'; 
-					break;
-case 'field10': $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useterms" ' . $qpp['useterms'] . ' value="checked" />';
-					$type = 'Terms and Conditions';
-					$input = 'termsblurb';$checked = $qpp['termsblurb'];
-					$options = '<span class="description">URL of Terms and Conditions:</span><br>
+                break;
+                case 'field10': 
+                $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useterms" ' . $qpp['useterms'] . ' value="checked" />';
+                $type = 'Terms and Conditions';
+                $input = 'termsblurb';$checked = $qpp['termsblurb'];
+                $options = '<span class="description">URL of Terms and Conditions:</span><br>
 						<input type="text" name="termsurl" value="' . $qpp['termsurl'] . '" /><br>
                         <input type="checkbox" style="margin:0; padding: 0; border: none" name="termspage" ' . $qpp['termspage'] . ' value="checked" /> Open link in a new page';
-
- 
-					break;
-
+                break;
+                case 'field11': 
+                $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="useblurb" ' . $qpp['useblurb'] . ' value="checked" />';
+                $type = 'Additional Information';
+                $input = 'extrablurb';$checked = $qpp['useblurb'];
+                $options = '<span class="description">Add additional information to your form</span>';
+                break;
+                case 'field12': 
+                $check = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="userecurring" ' . $qpp['userecurring'] . ' value="checked" />';
+                $type = 'Recurring Payments';
+                $input = 'recurringblurb';
+                $checked = $qpp['userecurring'];
+                $options = '<table>
+                    <tr>
+                    <td><input type="radio" style="margin:0; padding: 0; border: none" name="recurring" value="D" '.$D.' /></td><td>Daily</td><td>for <input type="text" style="width:2em;padding:2px" name="Dvalue" value="' . $qpp['Dvalue'] . '" /></td><td><input type="text" style="width:6em;padding:2px" name="Dperiod" value="' . $qpp['Dperiod'] . '" /></td><td>max 90</td><td>
+                    <tr>
+                    <td><input type="radio" style="margin:0; padding: 0; border: none" name="recurring" value="W" '.$W.' /></td><td>Weekly</td><td>for <input type="text" style="width:2em;padding:2px" name="Wvalue" value="' . $qpp['Wvalue'] . '" /></td><td><input type="text" style="width:6em;padding:2px" name="Wperiod" value="' . $qpp['Wperiod'] . '" /></td><td>max 52</td><td>
+                    <tr>
+                    <td><input type="radio" style="margin:0; padding: 0; border: none" name="recurring" value="M" '.$M.' /></td><td>Monthly</td><td>for <input type="text" style="width:2em;padding:2px" name="Mvalue" value="' . $qpp['Mvalue'] . '" /></td><td><input type="text" style="width:6em;padding:2px" name="Mperiod" value="' . $qpp['Mperiod'] . '" /></td><td>max 24</td><td>
+                    <tr>
+                    <td><input type="radio" style="margin:0; padding: 0; border: none" name="recurring" value="Y" '.$Y.' /></td><td>Annually</td><td>for <input type="text" style="width:2em;padding:2px" name="Yvalue" value="' . $qpp['Yvalue'] . '" /></td><td><input type="text" style="width:6em;padding:2px" name="Yperiod" value="' . $qpp['Yperiod'] . '" /></td><td>max 5</td><td></table><p>Recurring payments only work if you have a Business or Premier account.<br>Using recurring payments will disable some form fields.</p>';
+                break;
 		}
-	$li_class = ( $checked) ? 'button_active' : 'button_inactive';	
+	$li_class = ($checked) ? 'button_active' : 'button_inactive';	
 	$content .='<li class="'.$li_class.'" id="'.$name.'">
 		<div style="float:left; width:5%;">'.$check.'</div>
 		<div style="float:left; width:25%;">'.$type.'</div>
@@ -867,3 +982,16 @@ function donate_loop() {
 	ob_end_clean();
 	return $output_string;
 	}
+
+function qpp_convert($from, $to, $amount)
+{
+   $content = file_get_contents('https://www.google.com/finance/converter?a='.$amount.'&from='.$from.'&to='.$to);
+
+   $doc = new DOMDocument;
+   @$doc->loadHTML($content);
+   $xpath = new DOMXpath($doc);
+
+   $result = $xpath->query('//*[@id="currency_converter_result"]/span')->item(0)->nodeValue;
+
+   return str_replace(' '.$to, '', $result);
+}
