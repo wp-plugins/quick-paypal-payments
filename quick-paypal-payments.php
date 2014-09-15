@@ -113,9 +113,7 @@ function qpp_display_form( $values, $errors, $id ) {
                     $content .= '</p>';
                 } elseif ($values['combine']) {
                     $checked = 'checked';
-                    $ret = array_map (
-                        function ($_) {return explode (';', $_);},
-                        explode (',', $values['reference']));
+                    $ret = array_map ('qpp_explode', explode (',', $values['reference']));
                     $content .= '<p class="payment" >'.$qpp['shortcodereference'].'<br>';
                     foreach ($ret as $item) {
                         $content .=  '<label><input type="radio" style="margin:0; padding: 0; border:none;width:auto;" name="reference" value="' .  $item[0].'&'.$item[1] . '" ' . $checked . '> ' .  $item[0].' '.$item[1] . '</label><br>';$checked='';}
@@ -223,6 +221,8 @@ function qpp_display_form( $values, $errors, $id ) {
 	$content .= '<div style="clear:both;"></div></div></div>'."\r\t";
 	echo $content;
 }
+
+function qpp_explode ($_) {return explode (';', $_);}
 
 function qpp_process_form($values,$id) {
 	$currency = qpp_get_stored_curr();
