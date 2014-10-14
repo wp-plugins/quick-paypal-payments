@@ -64,6 +64,14 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.9 =
+*	Bug fix for recurring payments
+*   New field to add extra information to the form
+*   Live totals option
+*   Option to collect personal information
+*   Product options now display as a new line on the PayPal page
+*   Shipping and handling now display properly on the PayPal page
+
 = 3.8 =
 *	Added field for recurring payment
 *   Added code to allow multiple products/prices
