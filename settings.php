@@ -1015,6 +1015,7 @@ function qpp_generate_csv() {
 		header( 'Content-Disposition: attachment; filename="'.$filename.'"');
 		header( 'Content-Type: text/csv');$outstream = fopen("php://output",'w');
 		$message = get_option( 'qpp_messages'.$id );
+        $messageoptions = qpp_get_stored_msg();
 		if(!is_array($message))$message = array();
 		$qpp = qpp_get_stored_options ($id);
         $address = qpp_get_stored_address ($id);
@@ -1026,16 +1027,18 @@ function qpp_generate_csv() {
 		array_push($headerrow, $qpp['stock']);
 		array_push($headerrow, $qpp['optionlabel']);
 		array_push($headerrow, $qpp['couponblurb']);
-        array_push($headerrow, $address['firstname']);
-        array_push($headerrow, $address['lastname']);
-        array_push($headerrow, $address['email']);
-        array_push($headerrow, $address['address1']);
-        array_push($headerrow, $address['address2']);
-        array_push($headerrow, $address['city']);
-        array_push($headerrow, $address['state']);
-        array_push($headerrow, $address['zip']);
-        array_push($headerrow, $address['country']);
-        array_push($headerrow, $address['night_phone_b']);
+        if ($messageoptions['showaddress']) {
+            array_push($headerrow, $address['email']);
+            array_push($headerrow, $address['firstname']);
+            array_push($headerrow, $address['lastname']);
+            array_push($headerrow, $address['address1']);
+            array_push($headerrow, $address['address2']);
+            array_push($headerrow, $address['city']);
+            array_push($headerrow, $address['state']);
+            array_push($headerrow, $address['zip']);
+            array_push($headerrow, $address['country']);
+            array_push($headerrow, $address['night_phone_b']);
+        }
 		fputcsv($outstream,$headerrow, ',', '"');
 		foreach(array_reverse( $message ) as $value) {
 			$cells = array();
@@ -1043,20 +1046,22 @@ function qpp_generate_csv() {
 			array_push($cells,$value['field1']);
 			array_push($cells,$value['field2']);
 			array_push($cells,$value['field3']);
-			array_push($cells,$value['field4']);
-			array_push($cells,$value['field5']);	
-            array_push($cells,$value['field6']);
-            array_push($cells,$value['field7']);
-            array_push($cells,$value['field8']);
-            array_push($cells,$value['field9']);
-            array_push($cells,$value['field10']);
-            array_push($cells,$value['field11']);
-            array_push($cells,$value['field12']);
-            array_push($cells,$value['field13']);
-            array_push($cells,$value['field14']);
-            array_push($cells,$value['field15']);
-            array_push($cells,$value['field16']);
-			fputcsv($outstream,$cells, ',', '"');
+			$value['field4'] = ($value['field4'] != $value['stocklabel'] ? $value['field4'] : ''); array_push($cells,$value['field4']);
+			$value['field5'] = ($value['field5'] != $value['optionlabel'] ? $value['field5'] : ''); array_push($cells,$value['field5']);	
+            $value['field6'] = ($value['field6'] != $value['couponblurb'] ? $value['field6'] : ''); array_push($cells,$value['field6']);
+            if ($messageoptions['showaddress']) {
+                $value['field8'] = ($value['field8'] != $address['email'] ? $value['field8'] : ''); array_push($cells,$value['field8']);
+                $value['field9'] = ($value['field9'] != $address['firstname'] ? $value['field9'] : ''); array_push($cells,$value['field9']);
+                $value['field10'] = ($value['field10'] != $address['lastname'] ? $value['field10'] : ''); array_push($cells,$value['field10']);
+                $value['field11'] = ($value['field11'] != $address['address1'] ? $value['field11'] : ''); array_push($cells,$value['field11']);
+                $value['field12'] = ($value['field12'] != $address['address2'] ? $value['field12'] : ''); array_push($cells,$value['field12']);
+                $value['field13'] = ($value['field13'] != $address['city'] ? $value['field13'] : ''); array_push($cells,$value['field13']);
+                $value['field14'] = ($value['field14'] != $address['state'] ? $value['field14'] : ''); array_push($cells,$value['field14']);
+                $value['field15'] = ($value['field15'] != $address['zip'] ? $value['field15'] : ''); array_push($cells,$value['field15']);
+                $value['field16'] = ($value['field16'] != $address['country'] ? $value['field16'] : ''); array_push($cells,$value['field16']);
+                $value['field17'] = ($value['field17'] != $address['night_phone_b'] ? $value['field17'] : ''); array_push($cells,$value['field17']);
+            }
+            fputcsv($outstream,$cells, ',', '"');
         }
 		fclose($outstream); 
 		exit;

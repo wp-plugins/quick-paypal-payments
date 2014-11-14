@@ -64,6 +64,10 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.10 =
+*	Umpteen bug fixes in the payment report/CSV download
+*   Added option to send payment lists as an email
+
 = 3.9 =
 *	Bug fix for recurring payments
 *   New field to add extra information to the form

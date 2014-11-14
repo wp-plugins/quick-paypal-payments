@@ -27,6 +27,22 @@ function qpp_show_messages($id) {
     $qpp = qpp_get_stored_options($id);
 	qpp_generate_csv();
 	
+    if( isset($_POST['qpp_emaillist'])) {
+        $message = get_option('qpp_messages'.$id);
+        $messageoptions = qpp_get_stored_msg();
+        $content = qpp_messagetable ($id,'checked');
+        $title = $id; if ($id == '') $title = 'Default';
+        $title = 'Payment List for '.$title.' as at '.date('j M Y'); 
+        global $current_user;
+        get_currentuserinfo();
+        $qpp_email = $current_user->user_email;
+        $headers = "From: {<{$qpp_email}>\r\n"
+            . "MIME-Version: 1.0\r\n"
+            . "Content-Type: text/html; charset=\"utf-8\"\r\n";	
+        wp_mail($qpp_email, $title, $content, $headers);
+        qpp_admin_notice('Message list has been sent to '.$qpp_email.'.');
+    }
+    
     if (isset($_POST['qpp_reset_message'.$id])) delete_option('qpp_messages'.$id);
 	
     if( isset( $_POST['Submit'])) {
@@ -47,7 +63,7 @@ function qpp_show_messages($id) {
         }
         $message = array_values($message);
         update_option('qpp_messages'.$id, $message ); 
-        qem_admin_notice('Selected payments have been deleted.');
+        qpp_admin_notice('Selected payments have been deleted.');
     }
     
     $messageoptions = qpp_get_stored_msg();
@@ -67,10 +83,12 @@ function qpp_show_messages($id) {
 	&nbsp;&nbsp;<input type="submit" name="Submit" class="button-secondary" value="Update options" />
 	</form></p>';
     $dashboard .='<form method="post" id="download_form" action="">';
-    $dashboard .= qpp_messagetable($id);
+    $dashboard .= qpp_messagetable($id,'');
     $dashboard .='<input type="hidden" name="formname" value = "'.$id.'" />
-    <input type="submit" name="download_qpp_csv" class="button-primary" value="Export to CSV" /> <input type="submit" name="qpp_reset_message" class="button-secondary" value="Delete All Registrants" onclick="return window.confirm( \'Are you sure you want to delete all the payment details?\' );"/>
-        <input type="submit" name="qpp_delete_selected" class="button-secondary" value="Delete Selected" onclick="return window.confirm( \'Are you sure you want to delete the selected payment details?\' );"/>
-        </form></div></div>';		
+    <input type="submit" name="download_qpp_csv" class="button-primary" value="Export to CSV" />
+    <input type="submit" name="qpp_emaillist" class="button-primary" value="Email List" />
+    <input type="submit" name="qpp_reset_message" class="button-secondary" value="Delete All Registrants" onclick="return window.confirm( \'Are you sure you want to delete all the payment details?\' );"/>
+    <input type="submit" name="qpp_delete_selected" class="button-secondary" value="Delete Selected" onclick="return window.confirm( \'Are you sure you want to delete the selected payment details?\' );"/>
+    </form></div></div>';		
 	echo $dashboard;
 	}
