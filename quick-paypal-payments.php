@@ -513,7 +513,7 @@ function qpp_loop($atts) {
 	$formvalues['stock'] = $qpp['stocklabel'];
     $formvalues['couponblurb'] = $qpp['couponblurb'];
     $formvalues['emailblurb'] = $qpp['emailblurb'];
-    $formvalues['combine'] = $formvalues['couponapplied'] = $formvalues['explode'] = $formvalues['recurring'] = '';
+    $formvalues['combine'] = $formvalues['couponapplied'] = $formvalues['couponget'] =$formvalues['maths'] = $formvalues['explodepay'] =  $formvalues['explode'] = $formvalues['recurring'] = '';
     if (strrpos($qpp['inputreference'],';') || strrpos($id,';')) $formvalues['combine'] = 'initial';
 
     if (!$labels) {
