@@ -278,6 +278,8 @@ function qpp_form_options($id) {
             'totalsblurb',
             'useaddress',
             'addressblurb',
+            'currency_seperator',
+            'selector'
         );
 		foreach ($options as $item) $qpp[$item] = stripslashes( $_POST[$item]);
         $ref = $qpp['recurring'].'value';
@@ -301,6 +303,8 @@ function qpp_form_options($id) {
     $$qpp['postagetype'] = 'checked';
     $$qpp['coupontype'] = 'checked';
     $$qpp['recurring'] = 'checked';
+    $$qpp['currency_seperator'] = 'checked';
+    $$qpp['selector'] = 'checked';
     $content = '<script>
     jQuery(function() {var qpp_sort = jQuery( "#qpp_sort" ).sortable({ axis: "y" ,
     update:function(e,ui) {
@@ -351,7 +355,10 @@ function qpp_form_options($id) {
             $type = 'Amount';
             $input = 'inputamount';
             $checked = 'checked';
-            $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedamount" ' . $qpp['fixedamount'] . ' value="checked" /> Display as a pre-set amount<br><span class="description">Use commas to create an options list</span><br><input type="checkbox" style="margin:0; padding: 0; border: none" name="allow_amount" ' . $qpp['allow_amount'] . ' value="checked" /> Do not validate (use default amount value)';
+            $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedamount" ' . $qpp['fixedamount'] . ' value="checked" /> Display as a pre-set amount<br><span class="description">Use commas to create an options list</span><br>
+            Options Selector: <input style="margin:0; padding:0; border:none;" type="radio" name="selector" value="radio" ' . $radio . ' /> Radio <input style="margin:0; padding:0; border:none;" type="radio" name="selector" value="dropdown" ' . $dropdown . ' /> Dropdown<br><input type="checkbox" style="margin:0; padding: 0; border: none" name="allow_amount" ' . $qpp['allow_amount'] . ' value="checked" /> Do not validate (use default amount value)<br>
+            Currency seperator: <input style="margin:0; padding:0; border:none;" type="radio" name="currency_seperator" value="period" ' . $period . ' /> Decimal Point <input style="margin:0; padding:0; border:none;" type="radio" name="currency_seperator" value="comma" ' . $comma . ' /> Comma<br>
+            ';
             break;
             case 'field5': 
             $check = $qpp['userecurring'] ? '&nbsp;' : '<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_options" ' . $qpp['use_options'] . ' value="checked" />';
@@ -390,9 +397,9 @@ function qpp_form_options($id) {
             $type = 'Coupon Code';
             $input = 'couponblurb';$checked = $qpp['usecoupon'];
             $options = '<span class="description">Button label:</span><br>
-						<input type="text" name="couponbutton" value="' . $qpp['couponbutton'] . '" /><br>
+		<input type="text" name="couponbutton" value="' . $qpp['couponbutton'] . '" /><br>
                         <span class="description">Coupon applied message:</span><br>
-						<input type="text" name="couponref" value="' . $qpp['couponref'] . '" /><br>
+		<input type="text" name="couponref" value="' . $qpp['couponref'] . '" /><br>
                         <a href="?page=quick-paypal-payments/settings.php&tab=coupon">Set coupon codes</a>'; 
             break;
             case 'field10': 

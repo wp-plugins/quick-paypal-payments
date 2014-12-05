@@ -64,6 +64,11 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.11 =
+*	Currency option to selected decimal points or comma
+*   When using multiple amounts you can now have radio or dropdown selectors
+*   Bug fix to the 'item number' field.
+
 = 3.10 =
 *	Umpteen bug fixes in the payment report/CSV download
 *   Added option to send payment lists as an email
