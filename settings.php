@@ -1106,6 +1106,7 @@ function donate_process($values) {
 	$content = '<h2>Waiting for paypal...</h2><form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="frmCart" id="frmCart">
 	<input type="hidden" name="cmd" value="_xclick">
 	<input type="hidden" name="business" value="graham@aerin.co.uk">
+    <input type="hidden" name="bn" value="AngellEYE_SP_Quick_PayPal_Payments" />
 	<input type="hidden" name="return" value="' .  $page_url . '">
 	<input type="hidden" name="cancel_return" value="' .  $page_url . '">
 	<input type="hidden" name="no_shipping" value="1">

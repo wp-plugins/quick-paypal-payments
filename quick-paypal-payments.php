@@ -418,6 +418,7 @@ foreach ($arr as $item) if ($address[$item] == $values[$item]) $values[$item] = 
     <input type="hidden" name="item_name" value="' .strip_tags($values['reference']). '"/>
     <input type="hidden" name="upload" value="1">
     <input type="hidden" name="business" value="' . $qpp_setup['email'] . '">
+    <input type="hidden" name="bn" value="AngellEYE_SP_Quick_PayPal_Payments" />
     <input type="hidden" name="return" value="' .  $send['thanksurl'] . '">
     <input type="hidden" name="cancel_return" value="' .  $send['cancelurl'] . '">
     <input type="hidden" name="currency_code" value="' .  $curr . '">';
