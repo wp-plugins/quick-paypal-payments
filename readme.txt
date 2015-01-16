@@ -64,6 +64,13 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.12 =
+*   Added option for form Reset
+*   Added message for invalid coupon code
+*   New range slider field
+*   Bug fixes for the Payment Lists
+*   Improved total calculation, it now works with radio fields.
+
 = 3.11 =
 *	Currency option to selected decimal points or comma
 *   When using multiple amounts you can now have radio or dropdown selectors

@@ -17,34 +17,36 @@ add_action('wp_enqueue_scripts','qpp_enqueue_scripts');
 if (is_admin()) require_once( plugin_dir_path( __FILE__ ) . '/settings.php' );
 
 function qpp_init() {
-	qpp_create_css_file ('');
-	}
+    qpp_create_css_file ('');
+}
 
 function qpp_enqueue_scripts() {
-	wp_enqueue_script( 'qpp_script',plugins_url('quick-paypal-payments.js', __FILE__));
-	wp_enqueue_style( 'qpp_style',plugins_url('quick-paypal-payments.css', __FILE__));
-	wp_enqueue_style( 'qpp_custom',plugins_url('quick-paypal-payments-custom.css', __FILE__));
-	}
+    wp_enqueue_script( 'qpp_script',plugins_url('quick-paypal-payments.js', __FILE__));
+    wp_enqueue_style( 'qpp_style',plugins_url('quick-paypal-payments.css', __FILE__));
+    wp_enqueue_style( 'qpp_custom',plugins_url('quick-paypal-payments-custom.css', __FILE__));
+    wp_enqueue_script("jquery-effects-core");
+    wp_enqueue_script('qpp_slider', plugins_url('quick-paypal-slider.js', __FILE__ ), array( 'jquery' ), false, true );
+}
 
 function qpp_create_css_file ($update) {
-	if (function_exists('file_put_contents')) {
-		$css_dir = plugin_dir_path( __FILE__ ) . '/quick-paypal-payments-custom.css' ;
-		$filename = plugin_dir_path( __FILE__ );
-		if (is_writable($filename) && (!file_exists($css_dir) || !empty($update))) {
-			$data = qpp_generate_css();
-			file_put_contents($css_dir, $data, LOCK_EX);
-			}
-		}
-	else add_action('wp_head', 'qpp_head_css');
-	}
+if (function_exists('file_put_contents')) {
+$css_dir = plugin_dir_path( __FILE__ ) . '/quick-paypal-payments-custom.css' ;
+$filename = plugin_dir_path( __FILE__ );
+if (is_writable($filename) && (!file_exists($css_dir) || !empty($update))) {
+$data = qpp_generate_css();
+file_put_contents($css_dir, $data, LOCK_EX);
+}
+}
+else add_action('wp_head', 'qpp_head_css');
+}
 
 function qpp_plugin_action_links($links, $file ) {
-	if ( $file == plugin_basename( __FILE__ ) ) {
-		$qpp_links = '<a href="'.get_admin_url().'options-general.php?page=quick-paypal-payments/settings.php">'.__('Settings').'</a>';
-		array_unshift( $links, $qpp_links );
-		}
-	return $links;
-	}
+if ( $file == plugin_basename( __FILE__ ) ) {
+$qpp_links = '<a href="'.get_admin_url().'options-general.php?page=quick-paypal-payments/settings.php">'.__('Settings').'</a>';
+array_unshift( $links, $qpp_links );
+}
+return $links;
+}
 
 function qpp_verify_form(&$formvalues,&$errors,$form) {
     $qpp = qpp_get_stored_options($form);
@@ -94,7 +96,9 @@ function qpp_display_form( $values, $errors, $id ) {
 	if (!empty($qpp['blurb'])) $qpp['blurb'] = '<p>' . $qpp['blurb'] . '</p>';
     $content = '<div class="qpp-style '.$formstyle.'"><div id="'.$style['border'].'">';
     if (count($errors) > 0) {
-        $content .= "<h2 style='color:red'>" . $error['errortitle'] . "</h2><p>" . $error['errorblurb'] . "</p>";
+        $content .= "<h2 id='qpp_reload' style='color:red'>" . $error['errortitle'] . "</h2>
+        <script type='text/javascript' language='javascript'>document.querySelector('#qpp_reload').scrollIntoView();</script>
+        <p>" . $error['errorblurb'] . "</p>";
         $arr = array('amount','reference','quantity','stock','answer','useterms','quantity');
         foreach ($arr as $item) if ($errors[$item] == 'error') $errors[$item] = ' style="border:1px solid red;" ';
         if ($errors['captcha']) $errors['captcha'] = 'border:1px solid red;';
@@ -104,37 +108,10 @@ function qpp_display_form( $values, $errors, $id ) {
 		if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imageabove') $content .= "<img src='".$qpp['paypal-url']."' />";
 		$content .=  $qpp['blurb'];
     }
-    if ($qpp['usetotals']) {
-        $content .= '<script>
-    window.onload = function() {
-        var calctotal = function calctotal() {
-            var c = b.value;var n = Number(c.replace(/[^0-9\.]+/g,""));var m = a.value * n;var h = 0;var p = 0;
-            if ("'.$qpp['useprocess'].'" == "checked") {
-                if ("'.$qpp['processtype'].'" == "processpercent"){
-                    var h = "'.$qpp['processpercent'].'".replace( /^\D+/g, "");
-                    var h = (m * h / 100);
-                } else {
-                    var h = "'.$qpp['processfixed'].'".replace( /^\D+/g, "") * 1;
-                }
-            }
-            if ("'.$qpp['usepostage'].'" == "checked") {
-                if ("'.$qpp['postagetype'].'" == "postagepercent"){
-                    var p = "'.$qpp['postagepercent'].'".replace( /^\D+/g, "");
-                    var p = (m * p / 100);
-                } else {
-                    var p = "'.$qpp['postagefixed'].'".replace( /^\D+/g, "") * 1;
-                }
-            }
-        producttotal.value = (h + p + m).toFixed(2);
-        };
-    var producttotal = document.getElementById("total_price'.$t.'");
-    var a = document.getElementById("qppquantity'.$t.'");
-    var b = document.getElementById("qppamount'.$t.'");
-    a.onkeyup = calctotal;
-    b.onkeyup = calctotal;
-    };
-    </script>';}
-    $content .= '<form id="frmPayment" name="frmPayment" method="post" action="">';
+    
+    
+    $content .= '
+    <form id="frmPayment'.$t.'" name="frmPayment'.$t.'" method="post" action="">';
 	foreach (explode( ',',$qpp['sort']) as $name) {
         switch ( $name ) {
             case 'field1':
@@ -167,6 +144,7 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
                 }
             }
             break;	
+            
             case 'field2':
             if ($qpp['use_stock']) {
                 $content .= '<p>
@@ -174,6 +152,7 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
                 </p>';
             }
             break;	
+            
             case 'field3':
             if ($qpp['use_quantity']){
                 $content .= '<p>
@@ -183,37 +162,54 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
                 $content .= '</p>';
             } else { $content .='<input type ="hidden" id="qppquantity'.$t.'" name="quantity" value="1">';}
             break;
+            
             case 'field4':
-            if (!$values['combine']) {
-                if (!$values['setpay']){
-                    $content .= '<p>
-                    <input type="text" '.$errors['amount'].' id="qppamount'.$t.'" label="Amount" name="amount" value="' . $values['amount'] . '" onfocus="qppclear(this, \'' . $values['amount'] . '\')" onblur="qpprecall(this, \'' . $values['amount'] . '\' )" />
-                    </p>';
+            if ($qpp['use_slider']) {
+                $content .='<p>'.$qpp['sliderlabel'].'</p>
+                <input type="range" id="qppamount'.$t.'" name="amount" min="'.$qpp['min'].'" max="'.$qpp['max'].'" value="'.$values['amount'].'" step="'.$qpp['step'].'" data-rangeslider>
+                <div class="qpp-slideroutput">';
+                if ($qpp['output-values']) {
+                    $content.= '<span class="qpp-sliderleft">'.$qpp['min'].'</span>
+                    <span class="qpp-slidercenter"><output></output></span>
+                    <span class="qpp-sliderright">'.$qpp['max'].'</span>';
                 } else {
-                    if ($values['explodepay']) {
-                        $ref = explode(",",$values['amount']);
-                        $content .= '<p class="payment" >'.$qpp['shortcodeamount'].'<br>';
-                        if($qpp['selector'] == 'dropdown') {
-                            $content .= '<select name="amount">';
-                            foreach ($ref as $item) {
-                                $selected = '';
-                                if ($values['amount'] == $item) $selected = 'selected';
-                                $content .= '<option value="' .  $item . '" ' . $selected .'>' .  $item . '</option>'."\r\t";
+                    $content.= '<span class="qpp-outputcenter"><output></output></span>';
+                }
+                $content.= '</div><div style="clear: both;"></div>';
+            } else {
+                if (!$values['combine']) {
+                    if (!$values['setpay']){
+                        $content .= '<p>
+                        <input type="text" '.$errors['amount'].' id="qppamount'.$t.'" label="Amount" name="amount" value="' . $values['amount'] . '" onfocus="qppclear(this, \'' . $values['amount'] . '\')" onblur="qpprecall(this, \'' . $values['amount'] . '\' )" />
+                        </p>';
+                    } else {
+                        if ($values['explodepay']) {
+                            $ref = explode(",",$values['amount']);
+                            $content .= '<p class="payment" >'.$qpp['shortcodeamount'].'<br>';
+                            if($qpp['selector'] == 'dropdown') {
+                                $content .= '<select name="amount">';
+                                foreach ($ref as $item) {
+                                    $selected = '';
+                                    if ($values['amount'] == $item) $selected = 'selected';
+                                    $content .= '<option value="' .  $item . '" ' . $selected .'>' .  $item . '</option>'."\r\t";
+                                }
+                                $content .= '</select>'."\r\t";
+                            } else {
+                                $checked = 'checked';
+                                foreach ($ref as $item) {
+                                    $content .=  '<label><input type="radio" id="qpptiddles" style="margin:0; padding: 0; border:none;width:auto;" name="amount" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';
+                                $checked='';
+                                }
+                            $content .= '</p>';
                             }
-                            $content .= '</select>'."\r\t";
-                        } else {
-                            $checked = 'checked';
-                            foreach ($ref as $item) {
-                                $content .=  '<label><input type="radio" id="qpptiddles" style="margin:0; padding: 0; border:none;width:auto;" name="amount" value="' .  $item . '" ' . $checked . '> ' .  $item . '</label><br>';
-                            $checked='';
-                            }
-                        $content .= '</p>';
                         }
+                        else $content .= '<p class="input" >' . $values['amount'] . '</p><input type="hidden" id="qppamount'.$id.'" name="amount" value="'.$values['fixedamount'].'" />';
                     }
-                    else $content .= '<p class="input" >' . $values['amount'] . '</p><input type="hidden" id="qppamount'.$id.'" name="amount" value="'.$values['fixedamount'].'" />';
+                    $content .= '<input type="hidden" name="radio_amount" value="0.00" />';
                 }
             }
             break;
+            
             case 'field5':
             if ($qpp['use_options']){
                 $content .= '<p class="input">' . $qpp['optionlabel'] . '</p><p>';
@@ -243,11 +239,13 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
             break;
             case 'field9':
             $content .= '<input type="hidden" name="couponapplied" value="'.$values['couponapplied'].'" />';
-            if ($qpp['usecoupon'] && $values['couponapplied']) $content .= '<p>'.$qpp['couponref'].'</p>
-            <input type="hidden" name="couponblurb" value="'.$values['couponblurb'].'" />';
+            if ($qpp['usecoupon'] && $values['couponapplied']) 
+                $content .= '<p>'.$qpp['couponref'].'</p>
+                <input type="hidden" name="couponblurb" value="'.$values['couponblurb'].'" />';
             if ($qpp['usecoupon'] && !$values['couponapplied']){
-                $content .= '<p>'.$values['couponget'].'
-                <input type="text" label="coupon" name="couponblurb" value="' . $values['couponblurb'] . '" onfocus="qppclear(this, \'' . $values['couponblurb'] . '\')" onblur="qpprecall(this, \'' . $values['couponblurb'] . '\')"/>
+                if ($values['couponerror']) $content .= '<p style="color:red">'.$values['couponerror'].'</p>';
+                $content .= '<p>'.$values['couponget'].'</p>';
+                $content .= '<p><input type="text" label="coupon" name="couponblurb" value="' . $values['couponblurb'] . '" onfocus="qppclear(this, \'' . $values['couponblurb'] . '\')" onblur="qpprecall(this, \'' . $values['couponblurb'] . '\')"/>
                 </p>
                 <p>
                 <input type="submit" value="'.$qpp['couponbutton'].'" id="couponsubmit" name="qppapply'.$id.'" />
@@ -288,16 +286,131 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
             break;
             case 'field14':
             if ($qpp['usetotals']) {
-                $content .= '<p style="text-align:right;font-weight:strong;">Total: '.$c['b'].'<input name="producttotal" style="width:5em" type="text" value="'.$values['producttotal'].'" id="total_price'.$t.'" readonly/>'.$c['a'].'</p>';
+                $content .= '<p style="font-weight:bold;">Total: '.$c['b'].'<input type="text" id="qpptotal" name="total" value="0.00" readonly="readonly" />'.$c['a'].'</p>';
             }
             break;
         }
     }
-	$caption = $qpp['submitcaption'];
+    $caption = $qpp['submitcaption'];
     if ($style['submit-button']) $content .= '<p><input type="image" value="' . $caption . '" style="border:none;width:100%;height:auto;overflow:hidden;" src="'.$style['submit-button'].'" name="qppsubmit'.$id.'" onClick="replaceContentInContainer(\'place'.$id.'\', \'rep_place'.$id.'\')"/>';
 	else $content .= '<p><input type="submit" value="' . $caption . '" id="submit" name="qppsubmit'.$id.'" /></p>';
-	$content .= '</form>'."\r\t";
+	if ($qpp['use_reset']) $content .= '<p><input type="reset" value="'.$qpp['resetcaption'] . '" /></p>';
+    $content .= '</form>'."\r\t";
 	if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imagebelow') $content .= '<img src="'.$qpp['paypal-url'].'" />';
+    if ($qpp['usetotals']) {
+        $content .= '<script type="text/javascript">
+        (function() {
+            function formatDecimal(val, n) {
+                n = n || 2;
+                var str = "" + Math.round ( parseFloat(val) * Math.pow(10, n) );
+                while (str.length <= n) {str = "0" + str;}
+                var pt = str.length - n;
+                return str.slice(0,pt) + "." + str.slice(pt);
+            }
+        
+        function getRadioVal(form, name) {
+            var radios = form.elements[name];
+            var val;
+            for (var i=0, len=radios.length; i<len; i++) {
+                if ( radios[i].checked == true ) {
+                    val = radios[i].value;
+                    break;
+                }
+            }
+            return val;
+        }
+    
+        function getSizePrice(e) {
+            this.form.elements["radio_amount"].value = parseFloat( this.value );
+            updateTotal(this.form);
+        }
+    
+        function getquantity() {
+            this.form.elements["qppquantity'.$t.'"].value = this.value;
+            updateTotal(this.form);
+        }
+
+        function getamount() {
+            this.form.elements["qppamount'.$t.'"].value = this.value;
+            updateTotal(this.form);
+        }
+
+        function updateTotal(form, explicitAmount) {
+
+            if (typeof optionalArg === "undefined")
+            {
+                var qty = parseFloat( form.elements["qppquantity'.$t.'"].value );
+                qty = qty || 1;
+                if ("'.$values['explodepay'].'"=="checked") {
+                    var radio_amount = parseFloat( form.elements["radio_amount"].value );
+                } else {
+                    var amount = parseFloat( form.elements["qppamount'.$t.'"].value );
+                }
+                amount = amount || 0;
+                radio_amount = radio_amount || 0;
+                var m = qty * (amount + radio_amount);
+            }
+            else
+            {
+                var m = explicitAmount;
+            }
+        
+            var h = 0;var p = 0;
+            if ("'.$qpp['useprocess'].'" == "checked") {
+                if ("'.$qpp['processtype'].'" == "processpercent"){
+                    var h = "'.$qpp['processpercent'].'".replace( /^\D+/g, "");
+                    var h = (m * h / 100);
+                } else {
+                    var h = "'.$qpp['processfixed'].'".replace( /^\D+/g, "") * 1;
+                }
+            }
+            if ("'.$qpp['usepostage'].'" == "checked") {
+                if ("'.$qpp['postagetype'].'" == "postagepercent"){
+                    var p = "'.$qpp['postagepercent'].'".replace( /^\D+/g, "");
+                    var p = (m * p / 100);
+                } else {
+                    var p = "'.$qpp['postagefixed'].'".replace( /^\D+/g, "") * 1;
+                }
+            }
+            form.elements["total"].value = formatDecimal(m + p + h);
+        }
+
+        var form = document.getElementById("frmPayment'.$t.'");
+
+        if ("'.$values['explodepay'].'"=="checked") {
+            var sz = form.elements["amount"];
+            for (var i=0, len=sz.length; i<len; i++) sz[i].onclick = getSizePrice;  
+            form.elements["radio_amount"].value = formatDecimal( parseFloat( getRadioVal(form, "amount") ) );
+            updateTotal(form);
+        } else {
+            var bx = document.getElementById("qppamount'.$t.'");
+            bx.onkeyup = getamount;
+        }
+        var ax = document.getElementById("qppquantity'.$t.'");
+        ax.onkeyup = getquantity;
+
+        jQuery(document).ready(function($){
+            $(function() {
+                var $document = $(document),selector = "[data-rangeslider]",$inputRange = $(selector);
+                function valueOutput(element) {
+                    var value = element.value,output = element.parentNode.getElementsByTagName("output")[0];output.innerHTML = value;
+                }
+
+                for (var i = $inputRange.length - 1; i >= 0; i--) {valueOutput($inputRange[i]);};
+                $document.on("change", selector, function(e) {valueOutput(e.target);});
+
+                $inputRange.rangeslider(
+                    {
+                        polyfill: false,
+                        onSlide: function(position, value) {
+                           updateTotal(document.getElementById("frmPayment'.$t.'"), value);
+                        }
+                    }
+                );
+            });
+        });
+    }());
+    </script>';}
 	$content .= '<div style="clear:both;"></div></div></div>'."\r\t";
 	echo $content;
 }
@@ -325,6 +438,21 @@ function qpp_postage ($qpp,$check,$quantity){
     return $packing;
 }
 
+function qpp_format_amount($currency,$qpp,$amount){
+    $curr = ($currency == '' ? 'USD' : $currency);
+    $decimal = array('HKD','JPY','MYR','TWD');$d='2';
+    foreach ($decimal as $item) if ($item == $curr) $d ='0';
+    if ($qpp['currency_seperator'] == 'comma' && strpos($amount,',')) {
+        $check = preg_replace ( '/[^,0-9]/', '', $amount);
+        $check = str_replace(',','.',$check);
+        $check = number_format($check, $d,'.','');
+    } else {
+        $check = preg_replace ( '/[^.0-9]/', '', $amount);
+        $check = number_format($check, $d,'.','');
+    }
+    return $check;
+}
+
 function qpp_process_form($values,$id) {
     $currency = qpp_get_stored_curr();
     $qpp = qpp_get_stored_options($id);
@@ -347,18 +475,9 @@ function qpp_process_form($values,$id) {
         $values['reference'] = $arr[0];
         $values['amount'] = $arr[1];
     }
-    $curr = ($currency[$id] == '' ? 'USD' : $currency[$id]);
-    $decimal = array('HKD','JPY','MYR','TWD');$d='2';
-    foreach ($decimal as $item) if ($item == $currency[$id]) $d ='0';
-        if ($qpp['currency_seperator'] == 'comma') {
-        $check = preg_replace ( '/[^,0-9]/', '', $values['amount']);
-        $check = str_replace(',','.',$check);
-        $check = number_format($check, $d,'.','');
-    } else {
-        $check = preg_replace ( '/[^.0-9]/', '', $values['amount']);
-        $check = number_format($check, $d,'.','');
-    }
-        $quantity =($values['quantity'] < 1 ? '1' : strip_tags($values['quantity']));
+    $check = qpp_format_amount($currency[$id],$qpp,$values['amount']);    
+
+    $quantity =($values['quantity'] < 1 ? '1' : strip_tags($values['quantity']));
    	if ($qpp['useprocess'] && $qpp['processtype'] == 'processpercent') {
 		$percent = preg_replace ( '/[^.,0-9]/', '', $qpp['processpercent']) / 100;
 		$handling = $check * $quantity * $percent;}
@@ -389,14 +508,14 @@ function qpp_process_form($values,$id) {
         'night_phone_b'
     );
 foreach ($arr as $item) if ($address[$item] == $values[$item]) $values[$item] = '';
-	$qpp_messages[] = array(
-		'field0' => $sentdate,
+    $qpp_messages[] = array(
+        'field0' => $sentdate,
 		'field1' => $values['reference'] ,
 		'field2' => $values['quantity'],
 		'field3' => $amounttopay,
 		'field4' => $values['stock'],
 		'field5' => $values['option1'],
-		'field6' => $values['couponblurb'],
+    'field6' => $values['couponblurb'],
         'field8' => $values['email'],
         'field9' => $values['firstname'],
         'field10' => $values['lastname'],
@@ -409,7 +528,6 @@ foreach ($arr as $item) if ($address[$item] == $values[$item]) $values[$item] = 
         'field17' => $values['night_phone_b']
     );
 	update_option('qpp_messages'.$id,$qpp_messages);
-    
     $content = '<h2 id="qpp_reload">'.$send['waiting'].'</h2>
     <script type="text/javascript" language="javascript">
     document.querySelector("#qpp_reload").scrollIntoView();
@@ -417,11 +535,11 @@ foreach ($arr as $item) if ($address[$item] == $values[$item]) $values[$item] = 
     <form action="'.$paypalurl.'" method="post" name="frmCart" id="frmCart" ' . $target . '>
     <input type="hidden" name="item_name" value="' .strip_tags($values['reference']). '"/>
     <input type="hidden" name="upload" value="1">
-    <input type="hidden" name="business" value="' . $qpp_setup['email'] . '">
+    <input type="hidden" name="business" value="'.$qpp_setup['email'].'">
     <input type="hidden" name="bn" value="AngellEYE_SP_Quick_PayPal_Payments" />
-    <input type="hidden" name="return" value="' .  $send['thanksurl'] . '">
-    <input type="hidden" name="cancel_return" value="' .  $send['cancelurl'] . '">
-    <input type="hidden" name="currency_code" value="' .  $curr . '">';
+    <input type="hidden" name="return" value="'.$send['thanksurl'].'">
+    <input type="hidden" name="cancel_return" value="'.$send['cancelurl'].'">
+    <input type="hidden" name="currency_code" value="'.$currency[$id].'">';
     
     if ($qpp['userecurring']) {
         $content .= '<input type="hidden" name="cmd" value="_xclick-subscriptions">';
@@ -621,7 +739,7 @@ function qpp_loop($atts) {
         }
     
     if (isset($_POST['qppapply'.$form])) {
-    	$check = preg_replace ( '/[^.,0-9]/', '', $formvalues['amount']); 
+        $check = qpp_format_amount($currency[$form],$qpp,$formvalues['amount']);
         $coupon = qpp_get_stored_coupon($form);
         $c = qpp_currency ($form);
         for ($i=1; $i<=$coupon['couponnumber']; $i++) {
@@ -629,13 +747,17 @@ function qpp_loop($atts) {
                 if ($coupon['coupontype'.$i] == 'percent'.$i) $check = $check - ($check * $coupon['couponpercent'.$i]/100);
                 if ($coupon['coupontype'.$i] == 'fixed'.$i) $check = $check - $coupon['couponfixed'.$i];
                 if ($check > 0) {
+                    $check = number_format($check, 2,'.','');
                     $formvalues['couponapplied'] = 'checked';
                     $formvalues['setpay'] = 'checked';
                     $formvalues['amount'] = $shortcodeamount.$c['b'].$check.$c['a'];
                     $formvalues['fixedamount'] = $check;
-                } else $formvalues['couponblurb'] = $qpp['couponblurb'];
+                } else {
+                   $formvalues['couponblurb'] = $qpp['couponblurb'];
+                }
             }
         }
+        if (!$formvalues['couponapplied']) $formvalues['couponerror'] = $coupon['couponerror'];
     }
     
     if (isset($_POST['qppsubmit'.$form]) || isset($_POST['qppsubmit'.$form.'_x'])) {
@@ -658,6 +780,7 @@ function qpp_loop($atts) {
 		$formvalues['thesum'] = "$digit1 - $digit2";
 		$formvalues['answer'] = $digit1 - $digit2;
         }
+          if ($qpp['use_slider']) $formvalues['amount'] = $qpp['initial'];
           qpp_display_form($formvalues,null,$form);
 		}
 	$output_string=ob_get_contents();
@@ -733,7 +856,7 @@ function qpp_generate_css() {
 			$submitfont = "font-family: ".$style['font-family'];
 			if ($style['header']) $header = ".qpp-style".$id." h2 {font-size: ".$style['header-size']."; color: ".$style['header-colour'].";}";
 			}
-		$input = ".qpp-style".$id." input[type=text]{border: ".$style['input-border'].";".$inputfont.";font-size: inherit;height:auto;line-height:normal;}\r\n";
+		$input = ".qpp-style".$id." input[type=text], .qpp-style".$id." select {border: ".$style['input-border'].";".$inputfont.";font-size: inherit;height:auto;line-height:normal;}\r\n";
 		$paragraph = ".qpp-style".$id." p{".$font.";}\r\n";
 		if ($style['submitwidth'] == 'submitpercent') $submitwidth = 'width:100%;';
 		if ($style['submitwidth'] == 'submitrandom') $submitwidth = 'width:auto;';
@@ -751,12 +874,18 @@ padding: 6px;}\r\n";
 		if ($style['corners'] == 'round') $corner = '5px'; else $corner = '0';
 		$corners = ".qpp-style".$id." input[type=text], .qpp-style".$id." textarea, .qpp-style".$id." select, .qpp-style".$id." #submit {border-radius:".$corner.";}\r\n";
 		if ($style['corners'] == 'theme') $corners = '';
+        
+        $slider = '.qpp-style'.$id.' div.rangeslider, .qpp-style'.$id.' div.rangeslider__fill {background: '.$style['slider-background'].';}
+        .qpp-style'.$id.' div.rangeslider__fill {background: '.$style['slider-revealed'].';}
+        .qpp-style'.$id.' div.rangeslider__handle {background: '.$style['handle-background'].';border: 1px solid '.$style['handle-border'].';}
+        .qpp-style'.$id.' div.qpp-slideroutput{font-size:'.$style['output-size'].';color:'.$style['output-colour'].';}'."\r";
+        
         $code .='
         .qpp-style'.$id.' .floatleft{float:left;}
         .qpp-style'.$id.' .floatright {float:right;text-align:right;}
         .qpp-style'.$id.' .floatright input {width:3em;text-align:right;}
-        .qpp-style'.$id.' input#total_price, .qpp-style'.$id.' input#total_postage, .qpp-style'.$id.' input#total_process, .qpp-style'.$id.' input#total_products {text-align:right;border:none;'.$bg.'}';
-		$code .= ".qpp-style".$id." {width:".$width.";}\r\n".$border.$corners.$header.$paragraph.$input.$background.$submitbutton.$couponbutton;
+        .qpp-style'.$id.' input#qpptotal {font-weight:bold;padding: 0;margin-left:3px;border:none;'.$bg.'}';
+		$code .= ".qpp-style".$id." {width:".$width.";}\r\n".$border.$corners.$header.$paragraph.$input.$background.$submitbutton.$couponbutton.$slider;
 		if ($style['use_custom'] == 'checked') $code .= $style['styles'] . "\r\n";
 		}
 	return $code;
@@ -805,12 +934,11 @@ function qpp_messagetable ($id,$email) {
     }
         
 	if (!$email) $dashboard .= '<th style="text-align:left">Delete</th></tr>';
-	
     if ($messageoptions['messageorder'] == 'newest') {
         $i=count($message) - 1;
         foreach(array_reverse( $message ) as $value) {
             if ($count < $showthismany ) {
-                if ($value['date']) $report = 'messages';
+                if ($value['field0']) $report = 'messages';
                 $content .= qpp_messagecontent ($id,$value,$options,$c,$messageoptions,$address,$arr,$i,$email);
                 $content .='</tr>';
                 $count = $count+1;
@@ -822,7 +950,7 @@ function qpp_messagetable ($id,$email) {
         $i=0;
         foreach($message as $value) {
 		if ($count < $showthismany ) {
-            if ($value['date']) $report = 'messages';
+            if ($value['field0']) $report = 'messages';
 			$content .= qpp_messagecontent ($id,$value,$options,$c,$messageoptions,$address,$arr,$i,$email);
 			$content .='</tr>';
 			$count = $count+1;
@@ -844,22 +972,22 @@ function qpp_messagecontent ($id,$value,$options,$c,$messageoptions,$address,$ar
             case 'field1': $content .= '<td>'.$value['field1'].'</td>';break;
 			case 'field2': $content .= '<td>'.$value['field2'].'</td>';break;
 			case 'field3': $content .= '<td>'.$c['b'].$amount.$c['a'].'</td>';break;
-			case 'field4': if ($options['use_stock']) 
+			case 'field4': if ($options['use_stock']) {
                 if ($options['stocklabel'] == $value['field4']) $value['field4']='';
-                $content .= '<td>'.$value['field4'].'</td>';break;
-			case 'field5': if ($options['use_options'])
-            if ($options['optionlabel'] == $value['field5']) $value['field5']='';
-                $content .= '<td>'.$value['field5'].'</td>';break;
-			case 'field6': if ($options['usecoupon'])
+                $content .= '<td>'.$value['field4'].'</td>';}break;
+			case 'field5': if ($options['use_options']) {
+                if ($options['optionlabel'] == $value['field5']) $value['field5']='';
+                $content .= '<td>'.$value['field5'].'</td>';}break;
+			case 'field6': if ($options['usecoupon']) {
                 if ($options['couponblurb'] == $value['field6']) $value['field6']='';
-                $content .= '<td>'.$value['field6'].'</td>';break;
+                $content .= '<td>'.$value['field6'].'</td>';}break;
 			}
 		}
     if ($messageoptions['showaddress']) {
         $arr = array('field8','field9','field10','field11','field12','field13','field14','field15','field16','field17');
         foreach ($arr as $item) {
             if ($value[$item] == $address[$item]) $value[$item] = '';
-            $content .= '<td>'.$value[$item].'</td>';
+                $content .= '<td>'.$value[$item].'</td>';
         }
     }
     $content .= '<td>';
@@ -916,12 +1044,13 @@ function qpp_get_stored_options ($id) {
 	$qpp = array_merge($default, $qpp);
     if (!strpos($qpp['sort'],'13')) {$qpp['sort'] = $qpp['sort'].',field13';update_option('qpp_options'.$id,$qpp);}
     if (!strpos($qpp['sort'],'14')) {$qpp['sort'] = $qpp['sort'].',field14';update_option('qpp_options'.$id,$qpp);}
+    if (!strpos($qpp['sort'],'15')) {$qpp['sort'] = $qpp['sort'].',field15';update_option('qpp_options'.$id,$qpp);}
 	return $qpp;
 	}
 
 function qpp_get_default_options () {
 	$qpp = array();
-	$qpp['sort'] = 'field1,field4,field2,field3,field5,field6,field7,field9,field12,field13,field14,field11,field8,field10';
+	$qpp['sort'] = 'field1,field4,field2,field3,field5,field6,field7,field9,field12,field13,field14,field11,field8,field10,field15';
     $qpp['title'] = 'Payment Form';
 	$qpp['blurb'] = 'Enter the payment details and submit';
 	$qpp['inputreference'] = 'Payment reference';
@@ -933,12 +1062,21 @@ function qpp_get_default_options () {
 	$qpp['optionlabel'] = 'Options';
 	$qpp['optionvalues'] = 'Large,Medium,Small';
 	$qpp['use_options'] = '';
+    $qpp['use_slider'] = '';
+    $qpp['sliderlabel'] = 'Amount to pay';
+    $qpp['min'] = '0';
+    $qpp['max'] = '100';
+    $qpp['initial'] = '50';
+    $qpp['step'] = '10';
+    $qpp['output-values'] = 'checked';
 	$qpp['shortcodereference'] = 'Payment for: ';
 	$qpp['shortcodeamount'] = 'Amount: ';
 	$qpp['paypal-location'] = 'imagebelow';
 	$qpp['captcha'] = '';
 	$qpp['mathscaption'] = 'Spambot blocker question';
 	$qpp['submitcaption'] = 'Make Payment';
+    $qpp['resetcaption'] = 'Reset Form';
+    $qpp['use_reset'] = '';
 	$qpp['useprocess'] = '';
 	$qpp['processblurb'] = 'A processing fee will be added before payment';
 	$qpp['processref'] = 'Processing Fee';
@@ -1040,6 +1178,12 @@ function qpp_get_default_style() {
 	$style['submitposition'] = 'submitleft';
     $style['coupon-colour'] = '#FFF';
 	$style['coupon-background'] = '#1f8416';
+    $style['slider-background'] = '#CCC';
+    $style['slider-revealed'] = '#00ff00';
+    $style['handle-background'] = 'white';
+    $style['handle-border'] = '#CCC';
+    $style['output-size'] = '1.2em';
+    $style['output-colour'] = '#465069';
 	$style['styles'] = 'plugin';
 	$style['use_custom'] = '';
 	$style['custom'] = "#qpp-style {\r\n\r\n}";
@@ -1075,7 +1219,10 @@ function qpp_get_default_coupon () {
         $coupon['couponpercent'.$i] = '10';
         $coupon['couponfixed'.$i] = '5';
         }
+    $coupon['couponget'] = 'Coupon Code:';
     $coupon['couponnumber'] = '10';
+    $coupon['duplicate'] = '';
+    $coupon['couponerror'] = 'Invalid Code';
     return $coupon;
     }
 
