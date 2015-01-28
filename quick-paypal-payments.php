@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.12
+Version: 3.12.1
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -287,6 +287,8 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
             case 'field14':
             if ($qpp['usetotals']) {
                 $content .= '<p style="font-weight:bold;">Total: '.$c['b'].'<input type="text" id="qpptotal" name="total" value="0.00" readonly="readonly" />'.$c['a'].'</p>';
+            } else {
+             $content .= '<input type="hidden" id="qpptotal" name="total"  />';   
             }
             break;
         }
@@ -297,121 +299,9 @@ if (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'in
 	if ($qpp['use_reset']) $content .= '<p><input type="reset" value="'.$qpp['resetcaption'] . '" /></p>';
     $content .= '</form>'."\r\t";
 	if ($qpp['paypal-url'] && $qpp['paypal-location'] == 'imagebelow') $content .= '<img src="'.$qpp['paypal-url'].'" />';
-    if ($qpp['usetotals']) {
-        $content .= '<script type="text/javascript">
-        (function() {
-            function formatDecimal(val, n) {
-                n = n || 2;
-                var str = "" + Math.round ( parseFloat(val) * Math.pow(10, n) );
-                while (str.length <= n) {str = "0" + str;}
-                var pt = str.length - n;
-                return str.slice(0,pt) + "." + str.slice(pt);
-            }
-        
-        function getRadioVal(form, name) {
-            var radios = form.elements[name];
-            var val;
-            for (var i=0, len=radios.length; i<len; i++) {
-                if ( radios[i].checked == true ) {
-                    val = radios[i].value;
-                    break;
-                }
-            }
-            return val;
-        }
-    
-        function getSizePrice(e) {
-            this.form.elements["radio_amount"].value = parseFloat( this.value );
-            updateTotal(this.form);
-        }
-    
-        function getquantity() {
-            this.form.elements["qppquantity'.$t.'"].value = this.value;
-            updateTotal(this.form);
-        }
-
-        function getamount() {
-            this.form.elements["qppamount'.$t.'"].value = this.value;
-            updateTotal(this.form);
-        }
-
-        function updateTotal(form, explicitAmount) {
-
-            if (typeof optionalArg === "undefined")
-            {
-                var qty = parseFloat( form.elements["qppquantity'.$t.'"].value );
-                qty = qty || 1;
-                if ("'.$values['explodepay'].'"=="checked") {
-                    var radio_amount = parseFloat( form.elements["radio_amount"].value );
-                } else {
-                    var amount = parseFloat( form.elements["qppamount'.$t.'"].value );
-                }
-                amount = amount || 0;
-                radio_amount = radio_amount || 0;
-                var m = qty * (amount + radio_amount);
-            }
-            else
-            {
-                var m = explicitAmount;
-            }
-        
-            var h = 0;var p = 0;
-            if ("'.$qpp['useprocess'].'" == "checked") {
-                if ("'.$qpp['processtype'].'" == "processpercent"){
-                    var h = "'.$qpp['processpercent'].'".replace( /^\D+/g, "");
-                    var h = (m * h / 100);
-                } else {
-                    var h = "'.$qpp['processfixed'].'".replace( /^\D+/g, "") * 1;
-                }
-            }
-            if ("'.$qpp['usepostage'].'" == "checked") {
-                if ("'.$qpp['postagetype'].'" == "postagepercent"){
-                    var p = "'.$qpp['postagepercent'].'".replace( /^\D+/g, "");
-                    var p = (m * p / 100);
-                } else {
-                    var p = "'.$qpp['postagefixed'].'".replace( /^\D+/g, "") * 1;
-                }
-            }
-            form.elements["total"].value = formatDecimal(m + p + h);
-        }
-
-        var form = document.getElementById("frmPayment'.$t.'");
-
-        if ("'.$values['explodepay'].'"=="checked") {
-            var sz = form.elements["amount"];
-            for (var i=0, len=sz.length; i<len; i++) sz[i].onclick = getSizePrice;  
-            form.elements["radio_amount"].value = formatDecimal( parseFloat( getRadioVal(form, "amount") ) );
-            updateTotal(form);
-        } else {
-            var bx = document.getElementById("qppamount'.$t.'");
-            bx.onkeyup = getamount;
-        }
-        var ax = document.getElementById("qppquantity'.$t.'");
-        ax.onkeyup = getquantity;
-
-        jQuery(document).ready(function($){
-            $(function() {
-                var $document = $(document),selector = "[data-rangeslider]",$inputRange = $(selector);
-                function valueOutput(element) {
-                    var value = element.value,output = element.parentNode.getElementsByTagName("output")[0];output.innerHTML = value;
-                }
-
-                for (var i = $inputRange.length - 1; i >= 0; i--) {valueOutput($inputRange[i]);};
-                $document.on("change", selector, function(e) {valueOutput(e.target);});
-
-                $inputRange.rangeslider(
-                    {
-                        polyfill: false,
-                        onSlide: function(position, value) {
-                           updateTotal(document.getElementById("frmPayment'.$t.'"), value);
-                        }
-                    }
-                );
-            });
-        });
-    }());
-    </script>';}
-	$content .= '<div style="clear:both;"></div></div></div>'."\r\t";
+        $content .= '<script type="text/javascript">';
+        if ($qpp['usetotals'] || $qpp['use_slider']) $content .='(function() {function formatDecimal(val, n) {n = n || 2;var str = "" + Math.round ( parseFloat(val) * Math.pow(10, n) );while (str.length <= n) {str = "0" + str;}var pt = str.length - n;return str.slice(0,pt) + "." + str.slice(pt);}function getRadioVal(form, name) {var radios = form.elements[name];var val;for (var i=0, len=radios.length; i<len; i++) {if ( radios[i].checked == true ) {val = radios[i].value;break;}}return val;}function getSizePrice(e) {this.form.elements["radio_amount"].value = parseFloat( this.value );updateTotal(this.form);}function getquantity() {this.form.elements["qppquantity'.$t.'"].value = this.value;updateTotal(this.form);}function getamount() {this.form.elements["qppamount'.$t.'"].value = this.value;updateTotal(this.form);}function updateTotal(form, explicitAmount) {if (typeof optionalArg === "undefined"){var qty = parseFloat( form.elements["qppquantity'.$t.'"].value );qty = qty || 1;if ("'.$values['explodepay'].'"=="checked") {var radio_amount = parseFloat( form.elements["radio_amount"].value );} else {var amount = parseFloat( form.elements["qppamount'.$t.'"].value );}amount = amount || 0;radio_amount = radio_amount || 0;var m = qty * (amount + radio_amount);}else{var m = explicitAmount;}var h = 0;var p = 0;if ("'.$qpp['useprocess'].'" == "checked") {if ("'.$qpp['processtype'].'" == "processpercent"){var h = "'.$qpp['processpercent'].'".replace( /^\D+/g, "");var h = (m * h / 100);} else {var h = "'.$qpp['processfixed'].'".replace( /^\D+/g, "") * 1;}}if ("'.$qpp['usepostage'].'" == "checked") {if ("'.$qpp['postagetype'].'" == "postagepercent"){var p = "'.$qpp['postagepercent'].'".replace( /^\D+/g, "");var p = (m * p / 100);} else {var p = "'.$qpp['postagefixed'].'".replace( /^\D+/g, "") * 1;}}form.elements["total"].value = formatDecimal(m + p + h);}var form = document.getElementById("frmPayment'.$t.'");if ("'.$values['explodepay'].'"=="checked") {var sz = form.elements["amount"];for (var i=0, len=sz.length; i<len; i++) sz[i].onclick = getSizePrice;  form.elements["radio_amount"].value = formatDecimal( parseFloat( getRadioVal(form, "amount") ) );updateTotal(form);} else {var bx = document.getElementById("qppamount'.$t.'");bx.onkeyup = getamount;}var ax = document.getElementById("qppquantity'.$t.'");ax.onkeyup = getquantity;jQuery(document).ready(function($){$(function() {var $document = $(document),selector = "[data-rangeslider]",$inputRange = $(selector);function valueOutput(element) {var value = element.value,output = element.parentNode.getElementsByTagName("output")[0];output.innerHTML = value;}for (var i = $inputRange.length - 1; i >= 0; i--) {valueOutput($inputRange[i]);};$document.on("change", selector, function(e) {valueOutput(e.target);});$inputRange.rangeslider({polyfill: false,onSlide: function(position, value) {updateTotal(document.getElementById("frmPayment'.$t.'"), value);}});});});}());';
+    $content .= '</script><div style="clear:both;"></div></div></div>'."\r\t";
 	echo $content;
 }
 
@@ -488,8 +378,8 @@ function qpp_process_form($values,$id) {
 		$packing = $check * $quantity * $percent;}
 	if ($qpp['usepostage'] && $qpp['postagetype'] == 'postagefixed') {
 		$packing = preg_replace ( '/[^.,0-9]/', '', $qpp['postagefixed']);}	
-	$handling = number_format($handling,$d);
-	$packing = number_format($packing,$d);
+    $handling = qpp_format_amount($currency[$id],$qpp,$handling);
+    $packing = qpp_format_amount($currency[$id],$qpp,$packing);
     $qpp_messages = get_option('qpp_messages'.$id);
    	if(!is_array($qpp_messages)) $qpp_messages = array();
 	$sentdate = date_i18n('d M Y');
@@ -869,8 +759,10 @@ padding: 6px;}\r\n";
 		if ($style['background'] == 'white') $background = ".qpp-style".$id." div {background:#FFF;}\r\n";
 		if ($style['background'] == 'color') {$background = ".qpp-style".$id." div {background:".$style['backgroundhex'].";}\r\n";$bg = "background:".$style['backgroundhex'].";";}
 		if ($style['backgroundimage']) $background = ".qpp-style".$id." #".$style['border']." {background: url('".$style['backgroundimage']."');}\r\n";
-		if ($style['widthtype'] == 'pixel') $width = preg_replace("/[^0-9]/", "", $style['width']) . 'px';
-		else $width = '100%';
+		$formwidth = preg_split('#(?<=\d)(?=[a-z%])#i', $style['width']);
+        if (!$formwidth[1]) $formwidth[1] = 'px';
+        if ($style['widthtype'] == 'pixel') $width = $formwidth[0].$formwidth[1];
+        else $width = '100%';
 		if ($style['corners'] == 'round') $corner = '5px'; else $corner = '0';
 		$corners = ".qpp-style".$id." input[type=text], .qpp-style".$id." textarea, .qpp-style".$id." select, .qpp-style".$id." #submit {border-radius:".$corner.";}\r\n";
 		if ($style['corners'] == 'theme') $corners = '';

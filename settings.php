@@ -18,6 +18,7 @@ function qpp_scripts_init() {
 	wp_enqueue_style( 'qpp_settings',plugins_url('settings.css', __FILE__));
 	wp_enqueue_media();
 	wp_enqueue_script('qpp-media', plugins_url('quick-paypal-media.js', __FILE__ ), array( 'jquery' ), false, true );
+    wp_enqueue_script('qpp-slider', plugins_url('quick-paypal-slider.js', __FILE__ ), array( 'jquery' ), false, true );
 	}
 
 add_action('admin_enqueue_scripts', 'qpp_scripts_init');
@@ -566,7 +567,7 @@ function qpp_styles($id) {
     <tr>
     <td></td>
     <td><input style="margin:0; padding:0; border:none;" type="radio" name="widthtype" value="percent" ' . $percent . ' /> 100% (fill the available space)<br />
-    <input style="margin:0; padding:0; border:none;" type="radio" name="widthtype" value="pixel" ' . $pixel . ' /> Pixel (fixed): <input type="text" style="width:4em" label="width" name="width" value="' . $style['width'] . '" /> px</td>
+    <input style="margin:0; padding:0; border:none;" type="radio" name="widthtype" value="pixel" ' . $pixel . ' /> Pixel (fixed): <input type="text" style="width:4em" label="width" name="width" value="' . $style['width'] . '" /> use px, em or %. Default is px.</td>
     </tr>
     <tr>
     <td colspan="2"><h2>Form Border</h2>
