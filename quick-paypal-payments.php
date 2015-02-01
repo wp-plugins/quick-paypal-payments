@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.12.1
+Version: 3.12.2
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -331,7 +331,10 @@ function qpp_postage ($qpp,$check,$quantity){
 function qpp_format_amount($currency,$qpp,$amount){
     $curr = ($currency == '' ? 'USD' : $currency);
     $decimal = array('HKD','JPY','MYR','TWD');$d='2';
-    foreach ($decimal as $item) if ($item == $curr) $d ='0';
+    foreach ($decimal as $item) {
+        if ($item == $curr) $d = '';
+        break;
+    }
     if ($qpp['currency_seperator'] == 'comma' && strpos($amount,',')) {
         $check = preg_replace ( '/[^,0-9]/', '', $amount);
         $check = str_replace(',','.',$check);
@@ -365,21 +368,28 @@ function qpp_process_form($values,$id) {
         $values['reference'] = $arr[0];
         $values['amount'] = $arr[1];
     }
+    if ($values['amount'] == 0) $values['amount'] = 1;
     $check = qpp_format_amount($currency[$id],$qpp,$values['amount']);    
 
     $quantity =($values['quantity'] < 1 ? '1' : strip_tags($values['quantity']));
    	if ($qpp['useprocess'] && $qpp['processtype'] == 'processpercent') {
 		$percent = preg_replace ( '/[^.,0-9]/', '', $qpp['processpercent']) / 100;
-		$handling = $check * $quantity * $percent;}
+		$handling = $check * $quantity * $percent;
+        $handling = qpp_format_amount($currency[$id],$qpp,$handling);
+    }
 	if ($qpp['useprocess'] && $qpp['processtype'] == 'processfixed') {
-		$handling = preg_replace ( '/[^.,0-9]/', '', $qpp['processfixed']);}
+		$handling = preg_replace ( '/[^.,0-9]/', '', $qpp['processfixed']);
+    $handling = qpp_format_amount($currency[$id],$qpp,$handling);
+    }
 	if ($qpp['usepostage'] && $qpp['postagetype'] == 'postagepercent') {
 		$percent = preg_replace ( '/[^.,0-9]/', '', $qpp['postagepercent']) / 100;
-		$packing = $check * $quantity * $percent;}
+		$packing = $check * $quantity * $percent;
+        $packing = qpp_format_amount($currency[$id],$qpp,$packing);
+    }
 	if ($qpp['usepostage'] && $qpp['postagetype'] == 'postagefixed') {
-		$packing = preg_replace ( '/[^.,0-9]/', '', $qpp['postagefixed']);}	
-    $handling = qpp_format_amount($currency[$id],$qpp,$handling);
-    $packing = qpp_format_amount($currency[$id],$qpp,$packing);
+		$packing = preg_replace ( '/[^.,0-9]/', '', $qpp['postagefixed']);
+        $packing = qpp_format_amount($currency[$id],$qpp,$packing);
+    }
     $qpp_messages = get_option('qpp_messages'.$id);
    	if(!is_array($qpp_messages)) $qpp_messages = array();
 	$sentdate = date_i18n('d M Y');

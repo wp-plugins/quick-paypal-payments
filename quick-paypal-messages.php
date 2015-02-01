@@ -87,7 +87,7 @@ function qpp_show_messages($id) {
     $dashboard .='<input type="hidden" name="formname" value = "'.$id.'" />
     <input type="submit" name="download_qpp_csv" class="button-primary" value="Export to CSV" />
     <input type="submit" name="qpp_emaillist" class="button-primary" value="Email List" />
-    <input type="submit" name="qpp_reset_message" class="button-secondary" value="Delete All Registrants" onclick="return window.confirm( \'Are you sure you want to delete all the payment details?\' );"/>
+    <input type="submit" name="qpp_reset_message" class="button-secondary" value="Delete All Payments" onclick="return window.confirm( \'Are you sure you want to delete all the payment details?\' );"/>
     <input type="submit" name="qpp_delete_selected" class="button-secondary" value="Delete Selected" onclick="return window.confirm( \'Are you sure you want to delete the selected payment details?\' );"/>
     </form></div></div>';		
 	echo $dashboard;
