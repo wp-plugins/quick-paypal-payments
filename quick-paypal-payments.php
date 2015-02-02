@@ -335,7 +335,10 @@ function qpp_format_amount($currency,$qpp,$amount){
         if ($item == $curr) $d = '';
         break;
     }
-    if ($qpp['currency_seperator'] == 'comma' && strpos($amount,',')) {
+if (!$d) {
+    $check = preg_replace ( '/[^.0-9]/', '', $amount);
+    $check = intval($check);
+} elseif ($qpp['currency_seperator'] == 'comma' && strpos($amount,',')) {
         $check = preg_replace ( '/[^,0-9]/', '', $amount);
         $check = str_replace(',','.',$check);
         $check = number_format($check, $d,'.','');
@@ -368,7 +371,6 @@ function qpp_process_form($values,$id) {
         $values['reference'] = $arr[0];
         $values['amount'] = $arr[1];
     }
-    if ($values['amount'] == 0) $values['amount'] = 1;
     $check = qpp_format_amount($currency[$id],$qpp,$values['amount']);    
 
     $quantity =($values['quantity'] < 1 ? '1' : strip_tags($values['quantity']));
