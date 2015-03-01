@@ -64,6 +64,11 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.13 =
+*   Dropdown option on selectable fields
+*   Bug fix for the $1 problem
+*   Improved styling on submit button images
+
 = 3.12.2 =
 *   Bug fix number_format calculation
 

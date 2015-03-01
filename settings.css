@@ -1,4 +1,5 @@
-.qpp-settings {width: 100%;}
+.wrapper {padding: 0 15px;}
+.qem-settings {width: 100%;}
 .qpp-options {border:1px solid #B52C00;background:#FFF;padding:0 10px 10px 10px;margin:10px 0 0 0;float:left;width:46%;width: calc(50% - 30px);}
 .qpp-options p {margin: 4px 0;padding: 0;}
 .qpp-options p span{font-weight:bold;}
