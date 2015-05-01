@@ -8,10 +8,12 @@ function qpp_get_stored_setup () {
     return $qpp_setup;
 }
 function qpp_get_default_setup () {
-    $qpp_setup = array();
-    $qpp_setup['current'] = '';
-    $qpp_setup['alternative'] = '';
-    $qpp_setup['sandbox'] = '';
+    $qpp_setup = array(
+        'current' => '',
+        'alternative' => '',
+        'sandbox' => '',
+        'encryption' => ''
+    );
     return $qpp_setup;
 }
 
@@ -22,10 +24,24 @@ function qpp_get_stored_curr () {
     $qpp_curr = array_merge($default, $qpp_curr);
     return $qpp_curr;
 }
-function qpp_get_default_curr () {	
+function qpp_get_default_curr () {
     $qpp_curr = array();
     $qpp_curr[''] = 'USD';
     return $qpp_curr;
+}
+
+function qpp_get_stored_email () {
+    $qpp_email = get_option('qpp_email');
+    if(!is_array($qpp_email)) $qpp_email = array();
+    $default = qpp_get_default_email();
+    $qpp_email = array_merge($default, $qpp_email);
+    return $qpp_email;
+}
+function qpp_get_default_email () {
+    $qpp_setup = qpp_get_stored_setup();
+    $qpp_email = array();
+    $qpp_email[''] = $qpp_setup['email'];
+    return $qpp_email;
 }
 
 function qpp_get_stored_msg () {
@@ -98,6 +114,7 @@ function qpp_get_default_options () {
     $qpp['postagefixed'] = '5';
     $qpp['usecoupon'] = '';
     $qpp['useblurb'] = '';
+    $qpp['useemail'] = '';
     $qpp['extrablurb'] = 'Make sure you complete the next field';
     $qpp['couponblurb'] = 'Enter coupon code';
     $qpp['couponref'] = 'Coupon Applied';
@@ -125,9 +142,10 @@ function qpp_get_default_options () {
     $qpp['addressblurb'] = 'Enter your details below';
     $qpp['usetotals'] = '';
     $qpp['totalsblurb'] = 'Total:';
-    $qpp['emailblurb'] = '';
+    $qpp['emailblurb'] = 'Your email address';
     $qpp['couponapplied'] = '';
     $qpp['currency_seperator'] = 'period';
+    $qpp['inline_amount'] = '';
     $qpp['selector'] = 'radio';
     $qpp['refselector'] = 'radio';
     $qpp['optionsselector'] = 'radio';
@@ -163,7 +181,7 @@ function qpp_get_default_style() {
     $style['font-family'] = 'arial, sans-serif';
     $style['font-size'] = '1em';
     $style['font-colour'] = '#465069';
-    $style['header'] = '';
+    $style['header-type'] = 'h2';
     $style['header-size'] = '1.6em';
     $style['header-colour'] = '#465069';
     $style['text-font-family'] = 'arial, sans-serif';
@@ -211,6 +229,23 @@ function qpp_get_default_error () {
     $error['errortitle'] = 'Oops, got a problem here';
     $error['errorblurb'] = 'Please check the payment details';
     return $error;
+}
+
+function qpp_get_stored_ipn () {
+    $ipn = get_option('qpp_ipn');
+    if(!is_array($ipn)) $ipn = array();
+    $default = qpp_get_default_ipn();
+    $ipn = array_merge($default, $ipn);
+    return $ipn;
+}
+
+function qpp_get_default_ipn () {
+    $ipn = array(
+        'ipn' => '',
+        'title' => 'Payment',
+        'paid' => 'Complete'
+    );
+    return $ipn;
 }
 
 function qpp_get_stored_coupon ($id) {

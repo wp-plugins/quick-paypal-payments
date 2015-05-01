@@ -3,7 +3,7 @@
 Contributors: 
 Tags: paypal payment form
 Requires at least: 2.7
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: trunk
 
 Zero to PayPal with just one shortcode. Jam packed with features and options with easy to use custom settings.
@@ -22,6 +22,7 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 *	Multi-language
 *	Add custom forms anywhere on your site
 *	Downloadable payment records
+*   Instant Payment Notifications
 
 = Developers plugin page =
 
@@ -30,6 +31,9 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 == Screenshots ==
 1. This is the main admin screen.
 2. An example form.
+3. The payment record
+
+More [example forms](http://quick-plugins.com/quick-paypal-payments/paypal-examples/).
 
 == Installation ==
 
@@ -63,6 +67,15 @@ At the bottom of the dashboard is a link called 'Payments'.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://quick-plugins.com/quick-paypal-payments/).
 
 == Changelog ==
+
+= 3.14 =
+*   Instant Payment Notifications
+*   Option to display inline radio buttons
+*   Updated Pre-population settings
+*   Notification emails
+*   Improvements to totals field
+*   Styling bug fixes
+*   Header size selection
 
 = 3.13 =
 *   Dropdown option on selectable fields
