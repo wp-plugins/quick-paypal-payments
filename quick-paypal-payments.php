@@ -227,7 +227,7 @@ function qpp_display_form( $values, $errors, $id ) {
     $p = qpp_postage($qpp,$values['producttotal'],'1');
     $h = qpp_handling($qpp,$values['producttotal'],'1');
     $t = $id;if ($t=='') $t='default';
-$hd = $style['header-type'];
+    $hd = $style['header-type'];
     $values['producttotal'] = $values['producttotal'] + $p +$h;
     $values['producttotal'] = number_format($values['producttotal'], $d,'.','');
     global $_GET;
@@ -238,7 +238,7 @@ $hd = $style['header-type'];
     $content = '<div class="qpp-style '.$formstyle.'"><div id="'.$style['border'].'">';
 
     if (count($errors) > 0) {
-        $content .= "<'.$hd.' id='qpp_reload' style='color:red'>" . $error['errortitle'] . "</'.$hd.'>
+        $content .= "<".$hd." id='qpp_reload' style='color:red'>" . $error['errortitle'] . "</".$hd.">
         <script type='text/javascript' language='javascript'>document.querySelector('#qpp_reload').scrollIntoView();</script>
         <p>" . $error['errorblurb'] . "</p>";
         $arr = array('amount','reference','quantity','stock','answer','useterms','quantity');
@@ -401,6 +401,7 @@ $hd = $style['header-type'];
                 </p>';
             }
             break;
+            
             case 'field10':
             if ($qpp['useterms']) {
                 if ($qpp['termspage']) $target = ' target="blank" ';
@@ -410,6 +411,7 @@ $hd = $style['header-type'];
                 <a href="'.$qpp['termsurl'].'"'.$target.'>'.$qpp['termsblurb'].'</a></p>';
             }
             break;
+            
             case 'field11':
             if ($qpp['useblurb']) $content .= '<p>' . $qpp['extrablurb'] . '</p>';
             break;
@@ -422,17 +424,17 @@ $hd = $style['header-type'];
                 $ref = explode(",",$values['recurring']);
             }
             break;
+            
             case 'field13':
             if ($qpp['useaddress']) {
                 $content .= '<p>' . $qpp['addressblurb'] . '</p>';
                 $arr = array('email','firstname','lastname','address1','address2','city','state','zip','country','night_phone_b');
                 foreach($arr as $item)
                     if ($values[$item])
-                    $content .='<input type="text" name="'.$item.'" value="'.$values[$item].'" 
-                    onfocus="qppclear(this, \'' . $values[$item] . '\')" 
-                    onblur="qpprecall(this, \'' . $values[$item] . '\')"/>';
+                    $content .='<input type="text" name="'.$item.'" value="'.$values[$item].'" onfocus="qppclear(this, \'' . $values[$item] . '\')" onblur="qpprecall(this, \'' . $values[$item] . '\')"/>';
             }
             break;
+            
             case 'field14':
             if ($qpp['usetotals']) {
                 $content .= '<p style="font-weight:bold;">Total: '.$c['b'].'<input type="text" id="qpptotal" name="total" value="0.00" readonly="readonly" />'.$c['a'].'</p>';
@@ -783,8 +785,8 @@ function qpp_process_form($values,$id) {
     
     if ($qpp['userecurring']) {
         $content .= '<input type="hidden" name="cmd" value="_xclick-subscriptions">';
-    } elseif ($qpp['encryption']) {
-        $content .= '<input type="hidden" name="cmd" value="_s-xclick">';
+    } elseif ($send['donate']) {
+        $content .= '<input type="hidden" name="cmd" value="_donations">';
     } else {
         $content .= '<input type="hidden" name="cmd" value="_xclick">';
     }
