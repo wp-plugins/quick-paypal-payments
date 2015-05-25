@@ -629,7 +629,7 @@ function qpp_styles($id) {
     <td><input style="margin:0; padding:0; border:none;" type="radio" name="background" value="white" ' . $white . ' /> White<br />
     <input style="margin:0; padding:0; border:none;" type="radio" name="background" value="theme" ' . $theme . ' /> Use theme colours<br />
     <input style="margin:0; padding:0; border:none;" type="radio" name="background" value="color" ' . $color . ' />
-    <input type="text" class="qcf-color" label="background" name="backgroundhex" value="' . $style['backgroundhex'] . '" /></td>
+    <input type="text" class="qpp-color" label="background" name="backgroundhex" value="' . $style['backgroundhex'] . '" /></td>
     </tr>
     <tr><td>Background<br>Image:</td>
     <td>
@@ -656,7 +656,7 @@ function qpp_styles($id) {
     <td><input type="text" style="width:6em" label="header-size" name="header-size" value="' . $style['header-size'] . '" /></td>
     </tr>
     <tr><td>Header Colour:</td>
-    <td><input type="text" class="qcf-color" label="header-colour" name="header-colour" value="' . $style['header-colour'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="header-colour" name="header-colour" value="' . $style['header-colour'] . '" /></td>
     </tr>
     <tr>
     <td colspan="2"><h2>Input fields</h2></td></tr>
@@ -695,7 +695,7 @@ function qpp_styles($id) {
     <tr><td>Font Size: </td>
     <td><input type="text" style="width:6em" label="text-font-size" name="text-font-size" value="' . $style['text-font-size'] . '" /></td></tr>
     <tr><td>Font Colour: </td>
-    <td><input type="text" class="qcf-color" label="text-font-colour" name="text-font-colour" value="' . $style['text-font-colour'] . '" /></td></tr>
+    <td><input type="text" class="qpp-color" label="text-font-colour" name="text-font-colour" value="' . $style['text-font-colour'] . '" /></td></tr>
     <tr><td colspan="2"><h2>Submit Button</h2></td>
     </tr>
     <tr><td>Font Colour: </td>
@@ -719,19 +719,19 @@ function qpp_styles($id) {
     </tr>
     <tr>
     <td>Normal Background</td>
-    <td><input type="text" class="qcf-color" label="input-border" name="slider-background" value="' . $style['slider-background'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="input-border" name="slider-background" value="' . $style['slider-background'] . '" /></td>
     </tr>
     <tr>
     <td>Revealed Background</td>
-    <td><input type="text" class="qcf-color" label="input-border" name="slider-revealed" value="' . $style['slider-revealed'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="input-border" name="slider-revealed" value="' . $style['slider-revealed'] . '" /></td>
     </tr>
     <tr>
     <td>Handle Background</td>
-    <td><input type="text" class="qcf-color" label="input-border" name="handle-background" value="' . $style['handle-background'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="input-border" name="handle-background" value="' . $style['handle-background'] . '" /></td>
     </tr>
     <tr>
     <td>Handle Border</td>
-    <td><input type="text" class="qcf-color" label="input-border" name="handle-border" value="' . $style['handle-border'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="input-border" name="handle-border" value="' . $style['handle-border'] . '" /></td>
     </tr>
     <tr>
     <td>Output Size</td>
@@ -739,7 +739,7 @@ function qpp_styles($id) {
     </tr>
     <tr>
     <td>Output Colour</td>
-    <td><input type="text" class="qcf-color" label="input-border" name="output-colour" value="' . $style['output-colour'] . '" /></td>
+    <td><input type="text" class="qpp-color" label="input-border" name="output-colour" value="' . $style['output-colour'] . '" /></td>
     </tr>
     </table>
 
@@ -1391,10 +1391,9 @@ function qpp_scripts_init() {
     wp_enqueue_script( 'qpp_script',plugins_url('quick-paypal-payments.js', __FILE__));
     wp_enqueue_style( 'qpp_style',plugins_url('quick-paypal-payments.css', __FILE__));
     wp_enqueue_style( 'qpp_custom',plugins_url('quick-paypal-payments-custom.css', __FILE__));
-    wp_enqueue_script('qpp_colorpicker_script', plugins_url('quick-paypal-color.js', __FILE__ ), array( 'wp-color-picker' ), false, true );
     wp_enqueue_style( 'qpp_settings',plugins_url('settings.css', __FILE__));
     wp_enqueue_media();
-    wp_enqueue_script('qpp-media', plugins_url('quick-paypal-media.js', __FILE__ ), array( 'jquery' ), false, true );
+    wp_enqueue_script('qpp-media', plugins_url('quick-paypal-media.js', __FILE__ ), array( 'jquery','wp-color-picker' ), false, true );
     wp_enqueue_script('qpp-slider', plugins_url('quick-paypal-slider.js', __FILE__ ), array( 'jquery' ), false, true );
 }
 
