@@ -19,3 +19,5 @@
 #qpp_sort li.button_active { background-color: white;}
 #qpp_sort li.button_inactive { background-color: #E0E0E0;}
 #qpp_sort li div {overflow:hidden;}
+
+.wp-color-result {margin-bottom: 0 !important;}

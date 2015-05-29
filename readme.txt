@@ -68,6 +68,14 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.15 =
+*   Improved error checking
+*   Required field selectors
+*   Border styles for required and normal fields
+*   Confirmation email after payment (IPN only)
+*   Clone settings option
+*   Color picker bug fix
+
 = 3.14 =
 *   Instant Payment Notifications
 *   Option to display inline radio buttons

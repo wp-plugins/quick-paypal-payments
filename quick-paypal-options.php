@@ -71,84 +71,85 @@ function qpp_get_stored_options ($id) {
 }
 
 function qpp_get_default_options () {
-    $qpp = array();
-    $qpp['sort'] = 'field1,field4,field2,field3,field5,field6,field7,field9,field12,field13,field14,field11,field8,field10,field15,field16';
-    $qpp['title'] = 'Payment Form';
-    $qpp['blurb'] = 'Enter the payment details and submit';
-    $qpp['inputreference'] = 'Payment reference';
-    $qpp['inputamount'] = 'Amount to pay';
-    $qpp['sandbox'] ='';
-    $qpp['quantitylabel'] = 'Quantity';
-    $qpp['quantity'] = '1';
-    $qpp['stocklabel'] = 'Item Number';
-    $qpp['use_stock'] = '';
-    $qpp['optionlabel'] = 'Options';
-    $qpp['optionvalues'] = 'Large,Medium,Small';
-    $qpp['use_options'] = '';
-    $qpp['use_slider'] = '';
-    $qpp['sliderlabel'] = 'Amount to pay';
-    $qpp['min'] = '0';
-    $qpp['max'] = '100';
-    $qpp['initial'] = '50';
-    $qpp['step'] = '10';
-    $qpp['output-values'] = 'checked';
-    $qpp['shortcodereference'] = 'Payment for: ';
-    $qpp['shortcodeamount'] = 'Amount: ';
-    $qpp['paypal-location'] = 'imagebelow';
-    $qpp['captcha'] = '';
-    $qpp['mathscaption'] = 'Spambot blocker question';
-    $qpp['submitcaption'] = 'Make Payment';
-    $qpp['resetcaption'] = 'Reset Form';
-    $qpp['use_reset'] = '';
-    $qpp['useprocess'] = '';
-    $qpp['processblurb'] = 'A processing fee will be added before payment';
-    $qpp['processref'] = 'Processing Fee';
-    $qpp['processtype'] = 'processpercent';
-    $qpp['processpercent'] = '5';
-    $qpp['processfixed'] = '2';
-    $qpp['usepostage'] = '';
-    $qpp['postageblurb'] = 'Post and Packing will be added before payment';
-    $qpp['postageref'] = 'Post and Packing';
-    $qpp['postagetype'] = 'postagefixed';
-    $qpp['postagepercent'] = '5';
-    $qpp['postagefixed'] = '5';
-    $qpp['usecoupon'] = '';
-    $qpp['useblurb'] = '';
-    $qpp['useemail'] = '';
-    $qpp['extrablurb'] = 'Make sure you complete the next field';
-    $qpp['couponblurb'] = 'Enter coupon code';
-    $qpp['couponref'] = 'Coupon Applied';
-    $qpp['couponbutton'] = 'Apply Coupon';
-    $qpp['termsblurb'] = 'I agree to the Terms and Conditions';
-    $qpp['termsurl'] = home_url();
-    $qpp['termspage'] = 'checked';
-    $qpp['quantitymaxblurb'] = 'maximum of 99';
-    $qpp['userecurring'] = '';
-    $qpp['recurringblurb'] = 'Subscription details:';
-    $qpp['recurring'] = 'M';
-    $qpp['recurringhowmany'] = '24';
-    $qpp['Dvalue'] = '90';
-    $qpp['Wvalue'] = '52';
-    $qpp['Mvalue'] = '24';
-    $qpp['Yvalue'] = '5';
-    $qpp['Dperiod'] = 'days';
-    $qpp['Wperiod'] = 'weeks';
-    $qpp['Mperiod'] = 'months';
-    $qpp['Yperiod'] = 'years';
-    $qpp['srt'] = '12';
-    $qpp['payments'] = 'Number of payments:';
-    $qpp['every'] = 'Payment every';
-    $qpp['useaddress'] = '';
-    $qpp['addressblurb'] = 'Enter your details below';
-    $qpp['usetotals'] = '';
-    $qpp['totalsblurb'] = 'Total:';
-    $qpp['emailblurb'] = 'Your email address';
-    $qpp['couponapplied'] = '';
-    $qpp['currency_seperator'] = 'period';
-    $qpp['inline_amount'] = '';
-    $qpp['selector'] = 'radio';
-    $qpp['refselector'] = 'radio';
-    $qpp['optionsselector'] = 'radio';
+    $qpp = array(
+        'sort' => 'field1,field4,field2,field3,field5,field6,field7,field9,field12,field13,field14,field11,field8,field10,field15,field16',
+        'title' => 'Payment Form',
+        'blurb' => 'Enter the payment details and submit',
+        'inputreference' => 'Payment reference',
+        'inputamount' => 'Amount to pay',
+        'sandbox' =>'',
+        'quantitylabel' => 'Quantity',
+        'quantity' => '1',
+        'stocklabel' => 'Item Number',
+        'use_stock' => '',
+        'optionlabel' => 'Options',
+        'optionvalues' => 'Large,Medium,Small',
+        'use_options' => '',
+        'use_slider' => '',
+        'sliderlabel' => 'Amount to pay',
+        'min' => '0',
+        'max' => '100',
+        'initial' => '50',
+        'step' => '10',
+        'output-values' => 'checked',
+        'shortcodereference' => 'Payment for: ',
+        'shortcodeamount' => 'Amount: ',
+        'paypal-location' => 'imagebelow',
+        'captcha' => '',
+        'mathscaption' => 'Spambot blocker question',
+        'submitcaption' => 'Make Payment',
+        'resetcaption' => 'Reset Form',
+        'use_reset' => '',
+        'useprocess' => '',
+        'processblurb' => 'A processing fee will be added before payment',
+        'processref' => 'Processing Fee',
+        'processtype' => 'processpercent',
+        'processpercent' => '5',
+        'processfixed' => '2',
+        'usepostage' => '',
+        'postageblurb' => 'Post and Packing will be added before payment',
+        'postageref' => 'Post and Packing',
+        'postagetype' => 'postagefixed',
+        'postagepercent' => '5',
+        'postagefixed' => '5',
+        'usecoupon' => '',
+        'useblurb' => '',
+        'useemail' => '',
+        'extrablurb' => 'Make sure you complete the next field',
+        'couponblurb' => 'Enter coupon code',
+        'couponref' => 'Coupon Applied',
+        'couponbutton' => 'Apply Coupon',
+        'termsblurb' => 'I agree to the Terms and Conditions',
+        'termsurl' => home_url(),
+        'termspage' => 'checked',
+        'quantitymaxblurb' => 'maximum of 99',
+        'userecurring' => '',
+        'recurringblurb' => 'Subscription details:',
+        'recurring' => 'M',
+        'recurringhowmany' => '24',
+        'Dvalue' => '90',
+        'Wvalue' => '52',
+        'Mvalue' => '24',
+        'Yvalue' => '5',
+        'Dperiod' => 'days',
+        'Wperiod' => 'weeks',
+        'Mperiod' => 'months',
+        'Yperiod' => 'years',
+        'srt' => '12',
+        'payments' => 'Number of payments:',
+        'every' => 'Payment every',
+        'useaddress' => '',
+        'addressblurb' => 'Enter your details below',
+        'usetotals' => '',
+        'totalsblurb' => 'Total:',
+        'emailblurb' => 'Your email address',
+        'couponapplied' => '',
+        'currency_seperator' => 'period',
+        'inline_amount' => '',
+        'selector' => 'radio',
+        'refselector' => 'radio',
+        'optionsselector' => 'radio'
+    );
     return $qpp;
 }
 
@@ -161,10 +162,13 @@ function qpp_get_stored_send($id) {
 }
     
 function qpp_get_default_send() {
-    $send['waiting'] = 'Waiting for PayPal...';
-    $send['cancelurl'] = '';
-    $send['thanksurl'] = '';
-    $send['target'] = 'current';
+    $send = array(
+        'waiting' => 'Waiting for PayPal...',
+        'cancelurl' => '',
+        'thanksurl' => '',
+        'target' => 'current',
+        'whenconfirm' => 'aftersubmisson'
+    );
     return $send;
 }
 
@@ -177,43 +181,47 @@ function qpp_get_stored_style($id) {
 }
 
 function qpp_get_default_style() {
-    $style['font'] = 'plugin';
-    $style['font-family'] = 'arial, sans-serif';
-    $style['font-size'] = '1em';
-    $style['font-colour'] = '#465069';
-    $style['header-type'] = 'h2';
-    $style['header-size'] = '1.6em';
-    $style['header-colour'] = '#465069';
-    $style['text-font-family'] = 'arial, sans-serif';
-    $style['text-font-size'] = '1em';
-    $style['text-font-colour'] = '#465069';
-    $style['width'] = 280;
-    $style['form-border'] = '1px solid #415063';
-    $style['widthtype'] = 'pixel';
-    $style['border'] = 'plain';
-    $style['input-border'] = '1px solid #415063';
-    $style['input-required'] = '1px solid #00C618';
-    $style['bordercolour'] = '#415063';
-    $style['background'] = 'white';
-    $style['backgroundhex'] = '#FFF';
-    $style['corners'] = 'corner';
-    $style['submit-colour'] = '#FFF';
-    $style['submit-background'] = '#343838';
-    $style['submit-button'] = '';
-    $style['submit-border'] = '1px solid #415063';
-    $style['submitwidth'] = 'submitpercent';
-    $style['submitposition'] = 'submitleft';
-    $style['coupon-colour'] = '#FFF';
-    $style['coupon-background'] = '#1f8416';
-    $style['slider-background'] = '#CCC';
-    $style['slider-revealed'] = '#00ff00';
-    $style['handle-background'] = 'white';
-    $style['handle-border'] = '#CCC';
-    $style['output-size'] = '1.2em';
-    $style['output-colour'] = '#465069';
-    $style['styles'] = 'plugin';
-    $style['use_custom'] = '';
-    $style['custom'] = "#qpp-style {\r\n\r\n}";
+    $style = array(
+        'font' => 'plugin',
+        'font-family' => 'arial, sans-serif',
+        'font-size' => '1em',
+        'font-colour' => '#465069',
+        'header-type' => 'h2',
+        'header-size' => '1.6em',
+        'header-colour' => '#465069',
+        'text-font-family' => 'arial, sans-serif',
+        'text-font-size' => '1em',
+        'text-font-colour' => '#465069',
+        'width' => 280,
+        'form-border' => '1px solid #415063',
+        'widthtype' => 'pixel',
+        'border' => 'plain',
+        'input-border' => '1px solid #415063',
+        'required-border' => '1px solid #00C618',
+        'error-colour' => '#FF0000',
+        'bordercolour' => '#415063',
+        'background' => 'white',
+        'backgroundhex' => '#FFF',
+        'corners' => 'corner',
+        'submit-colour' => '#FFF',
+        'submit-background' => '#343838',
+        'submit-button' => '',
+        'submit-border' => '1px solid #415063',
+        'submitwidth' => 'submitpercent',
+        'submitposition' => 'submitleft',
+        'coupon-colour' => '#FFF',
+        'coupon-background' => '#1f8416',
+        'slider-background' => '#CCC',
+        'slider-revealed' => '#00ff00',
+        'handle-background' => 'white',
+        'handle-border' => '#CCC',
+        'output-size' => '1.2em',
+        'output-colour' => '#465069',
+        'styles' => 'plugin',
+        'use_custom' => '',
+        'custom' => "#qpp-style {\r\n\r\n}",
+        'header-type' => 'h2'
+    );
     return $style;
 }
 
@@ -226,8 +234,10 @@ function qpp_get_stored_error ($id) {
 }
 
 function qpp_get_default_error () {
-    $error['errortitle'] = 'Oops, got a problem here';
-    $error['errorblurb'] = 'Please check the payment details';
+    $error = array(
+        'errortitle' => 'Oops, got a problem here',
+        'errorblurb' => 'Please check the payment details'
+    );
     return $error;
 }
 
@@ -279,15 +289,17 @@ function qpp_get_stored_address ($id) {
 }
 
 function qpp_get_default_address () {
-    $address['firstname']= 'First Name';
-    $address['lastname']= 'Last Name';
-    $address['email']= 'Email';
-    $address['address1']= 'Address Line 1';
-    $address['address2']= 'Address Line 2';
-    $address['city']= 'City';
-    $address['state']= 'State';
-    $address['zip']= 'ZIP Code';
-    $address['country']= 'Country';
-    $address['night_phone_b']= 'Phone Number';
+    $address = array(
+        'firstname' => 'First Name',
+        'lastname' => 'Last Name',
+        'email' => 'Your Email Address',
+        'address1' => 'Address Line 1',
+        'address2' => 'Address Line 2',
+        'city' => 'City',
+        'state' => 'State',
+        'zip' => 'ZIP Code',
+        'country' => 'Country',
+        'night_phone_b' => 'Phone Number'
+    );
     return $address;
 }
