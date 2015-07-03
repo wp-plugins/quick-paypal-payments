@@ -68,6 +68,7 @@ function qpp_show_messages($id) {
     }
     
     $messageoptions = qpp_get_stored_msg();
+    $fifty = $hundred = $all = $oldest = $newest = '';
     $showthismany = '9999';
     if ($messageoptions['messageqty'] == 'fifty') $showthismany = '50';
     if ($messageoptions['messageqty'] == 'hundred') $showthismany = '100';

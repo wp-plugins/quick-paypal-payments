@@ -11,6 +11,7 @@ function qpp_admin_tabs($current = 'settings') {
         'settings' => 'Form Settings',
         'styles' => 'Styling',
         'send' => 'Send Options',
+        'autoresponce' => 'Auto Responder',
         'ipn' => 'IPN',
         'error' => 'Error Messages'
     ); 
@@ -40,7 +41,7 @@ function qpp_tabbed_page() {
         case 'coupon' : qpp_coupon_codes($id); break;
         case 'ipn' : qpp_ipn_page(); break;
         case 'donate' : qpp_donate_page(); break;
-
+        case 'autoresponce' : qpp_autoresponce_page($id); break;
     }
     echo '';
 }
@@ -173,7 +174,8 @@ function qpp_setup ($id) {
     <h2>Options and Settings</h2>
     <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=settings">Form Settings.</a></span> Change the layout of the form, add or remove fields and the order they appear and edit the labels and captions.</p>
     <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=styles">Styling.</a></span> Change fonts, colours, borders, images and submit button.</p>
-    <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=reply">Send Options.</a></span> Change the thank you message and how the form is sent.</p>
+    <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=reply">Send Options.</a></span> Change how the form is sent.</p>
+    <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=autoreponce">Auto Responder.</a></span> Set up a thank you message.</p>
 <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=ipn">Instant Payment Notification.</a></span> Keep track of completed payments.</p>
     <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/settings.php&tab=error">Error Messages.</a></span> Change the error message.</p>
     <p><span style="font-weight:bold"><a href="?page=quick-paypal-payments/quick-paypal-messages.php">Payment Records.</a></span> See all the payment records. Or click on the <b>Payments</b> link in the dashboard menu.</p>
@@ -825,11 +827,9 @@ function qpp_send_page($id) {
             'cancelurl',
             'thanksurl',
             'target',
-            'thankyou',
-            'thankyoumessage',
             'email',
             'donate',
-            'whenconfirm'
+            'combine'
         );
         foreach ($options as $item) {
             $send[$item] = stripslashes( $_POST[$item]);
@@ -847,7 +847,6 @@ function qpp_send_page($id) {
     $newpage=$customurl='';
     $send = qpp_get_stored_send($id);
     $$send['target'] = 'checked';
-    $$send['whenconfirm'] = 'checked';
     $$send['lc'] = 'selected';
     qpp_create_css_file ('update');
     $content ='<div class="qpp-settings"><div class="qpp-options">';
@@ -901,13 +900,10 @@ function qpp_send_page($id) {
     <p>URL of thank you page</p>
     <input type="text" style="width:100%" name="thanksurl" value="' . $send['thanksurl'] . '" />
     <h2>Confirmation Message</h2>
-    <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="thankyou" ' . $send['thankyou'] . ' value="checked" /> Send Confirmation Message</p>
-    <p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="whenconfirm" value="aftersubmission" ' . $aftersubmission . ' /> After submission to PayPal<br>
-    <input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="whenconfirm" value="afterpayment" ' . $afterpayment . ' /> After payment (only works if IPN is active)</span></p>
-    <p class="description">Only works if you collect an email address on the <a href="?page=quick-paypal-payments/settings.php&tab=settings">Form Settings</a>.</p>
-    <p>Message:<br><textarea  name="thankyoumessage" label="Radio" rows="4">' . $send['thankyoumessage'] . '</textarea></p>
+    <p>You can sen the payee a confirmation message using the <a href="?page=quick-paypal-payments/settings.php&tab=autoresponce">Auto Responder</a> options.</p>
     <h2>Custom Paypal Settings</h2>
     <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="donate" ' . $send['donate'] . ' value="checked" /> Form is for donations only</p>
+    <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="combine" ' . $send['combine'] . ' value="checked" /> Include Postage and Processing in the amount to pay.</p>
     <p>If you have a custom PayPal page enter the URL here. Leave blank to use the standard PayPal payment page</p>
     <p><input type="text" style="width:100%" name="customurl" value="' . $send['customurl'] . '" /></p>
     <p>Alternate PayPal email address:</p>
@@ -1040,6 +1036,64 @@ function qpp_ipn_page() {
     </div>
     </div>';
 	echo $content;
+}
+
+function qpp_autoresponce_page($id) {
+    qpp_change_form_update();
+    if( isset( $_POST['Submit']) && check_admin_referer("save_qpp")) {
+        $options = array(
+            'enable',
+            'whenconfirm',
+            'fromname',
+            'fromemail',
+            'subject',
+            'message',
+            'paymentdetails'
+        );
+        foreach ( $options as $item) {
+            $auto[$item] = stripslashes($_POST[$item]);
+        }
+        update_option( 'qpp_autoresponder'.$id, $auto );
+        if ($id) qpp_admin_notice("The autoresponder settings for " . $id . " have been updated.");
+        else qpp_admin_notice("The default form autoresponder settings have been updated.");
+    }
+    if( isset( $_POST['Reset']) && check_admin_referer("save_qpp")) {
+        delete_option('qpp_autoresponder'.$id);
+        qpp_admin_notice("The autoresponder settings for the form called ".$id. " have been reset.");
+    }
+	
+    $qpp_setup = qpp_get_stored_setup();
+    $id=$qpp_setup['current'];
+    $qpp = qpp_get_stored_options($id);
+    $auto = qpp_get_stored_autoresponder($id);
+    $$auto['whenconfirm'] = 'checked';
+    $message = $auto['message'];
+    $content ='<div class="qpp-settings"><div class="qpp-options" style="width:90%;">';
+    if ($id) $content .='<h2 style="color:#B52C00">Autoresponse settings for ' . $id . '</h2>';
+    else $content .='<h2 style="color:#B52C00">Default form autoresponse settings</h2>';
+    $content .= qpp_change_form($qpp_setup);
+    $content .='<p>The auto responder sends a confirmation message to the Payee. Use the editor below to send links, images and anything else you normally add to a post or page.</p>
+    <p class="description">Note that the autoresponder only works if you collect an email address on the <a href="?page=quick-paypal-payments/settings.php&tab=settings">Form Settings</a>.</p>
+    <form method="post" action="">
+    <p><input type="checkbox" style="margin: 0; padding: 0; border: none;" name="enable"' . $auto['enable'] . ' value="checked" /> Enable Auto Responder</p> 
+    <p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="whenconfirm" value="aftersubmission" ' . $aftersubmission . ' /> After submission to PayPal<br>
+    <input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="whenconfirm" value="afterpayment" ' . $afterpayment . ' /> After payment (only works if <a href="?page=quick-paypal-payments/settings.php&tab=ipn">IPN</a> is active)</span></p>
+    <p>From Name (<span class="description">Defaults to your <a href="'. get_admin_url().'options-general.php">Site Title</a> if left blank.</span>):<br>
+    <input type="text" style="width:50%" name="fromname" value="' . $auto['fromname'] . '" /></p>
+    <p>From Email (<span class="description">Defaults to the your <a href="?page=quick-paypal-payments/settings.php&tab=setup">PayPal email address</a> if left blank.</span>):<br>
+    <input type="text" style="width:50%" name="fromemail" value="' . $auto['fromemail'] . '" /></p>
+    <p>Subject</p>
+    <input style="width:100%" type="text" name="subject" value="' . $auto['subject'] . '"/><br>
+    <p>Message Content</p>';
+    echo $content;
+    wp_editor($message, 'message', $settings = array('textarea_rows' => '20','wpautop'=>false));
+    $content ='<p><input type="checkbox" style="margin: 0; padding: 0; border: none;" name="paymentdetails"' . $auto['paymentdetails'] . ' value="checked" /> Add payment details to the message</p> 
+    <p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the error settings for '.$id.'?\' );"/></p>';
+    $content .= wp_nonce_field("save_qpp");
+    $content .= '</form>
+    </div>
+    </div>';
+    echo $content;
 }
 
 function qpp_address($id) {

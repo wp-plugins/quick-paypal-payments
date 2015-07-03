@@ -68,6 +68,12 @@ If it all goes wrong, just reinstall the plugin and start again. If you need hel
 
 == Changelog ==
 
+= 3.16 =
+*   All new Autoresponder
+*   Minor bug fixes
+*   Moved scripts to footer
+*   Option to combine shipping and processing with total
+
 = 3.15 =
 *   Improved error checking
 *   Required field selectors

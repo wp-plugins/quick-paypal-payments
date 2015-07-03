@@ -3,7 +3,7 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.15
+Version: 3.16
 Author: fisicx
 Author URI: http://quick-plugins.com/
 */
@@ -23,7 +23,7 @@ function qpp_init() {
 }
 
 function qpp_enqueue_scripts() {
-    wp_enqueue_script( 'qpp_script',plugins_url('quick-paypal-payments.js', __FILE__));
+    wp_enqueue_script( 'qpp_script',plugins_url('quick-paypal-payments.js', __FILE__), array(), false, true);
     wp_enqueue_style( 'qpp_style',plugins_url('quick-paypal-payments.css', __FILE__));
     wp_enqueue_style( 'qpp_custom',plugins_url('quick-paypal-payments-custom.css', __FILE__));
     wp_enqueue_script("jquery-effects-core");
@@ -43,9 +43,16 @@ function qpp_loop($atts) {
     $v['quantity'] = 1;
     $v['stock'] = $qpp['stocklabel'];
     $v['couponblurb'] = $qpp['couponblurb'];
-    if (!$address['email'] || !$qpp['useaddress']) $v['email'] = $qpp['emailblurb'];
     $v['combine'] = $v['couponapplied'] = $v['couponget'] =$v['maths'] = $v['explodepay'] =  $v['explode'] = $v['recurring'] = $v['termschecked'] = '';
-    if (strrpos($qpp['inputreference'],';') || strrpos($id,';')) $v['combine'] = 'initial';
+    
+    if (!$address['email'] || !$qpp['useaddress']) {
+        $v['email'] = $qpp['emailblurb'];
+    }
+    
+    if (strrpos($qpp['inputreference'],';') || strrpos($id,';')) {
+        $v['combine'] = 'initial';
+    }
+    
     if (!$labels) {
         $shortcodereference = $qpp['shortcodereference'].' ';
         $shortcodeamount = $qpp['shortcodeamount'].' ';
@@ -190,29 +197,7 @@ function qpp_loop($atts) {
     return $output_string;
 }
 
-function qpp_dropdown($arr,$values,$name,$blurb) {
-    $content='';
-    if ($blurb) $content = '<p class="payment" >'.$blurb.'</p>';
-    $content .= '<select name="'.$name.'">';
-    if(!$values['combine']) {
-        foreach ($arr as $item) {
-            $selected = '';
-            if ($values[$name] == $item) $selected = 'selected';
-            $content .= '<option value="' .  $item . '" ' . $selected .'>' .  $item . '</option>'."\r\t";
-        }
-    } else {
-        foreach ($arr as $item) {
-            $selected = (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'initial' ? 'selected' : '');
-            $content .=  '<option value="' .  $item[0].'&'.$item[1] . '" ' . $selected . '> ' .  $item[0].' '.$item[1] . '</option>';$selected='';
-        }
-    }
-    $content .= '</select>'."\r\t";
-    return $content;
-}
-
 function qpp_display_form( $values, $errors, $id ) {
-    print_r($errors);
-
     $qpp_form = qpp_get_stored_setup();
     $qpp = qpp_get_stored_options($id);
     $error = qpp_get_stored_error($id);
@@ -234,10 +219,15 @@ function qpp_display_form( $values, $errors, $id ) {
     $values['producttotal'] = $values['producttotal'] + $p +$h;
     $values['producttotal'] = number_format($values['producttotal'], $d,'.','');
     global $_GET;
-    if(isset($_GET["coupon"])) {$values['couponblurb'] = $_GET["coupon"];$values['couponget']=$coupon['couponget'];}
-	if ($id) $formstyle=$id; else $formstyle='default';
+    
+    if(isset($_GET["coupon"])) {
+        $values['couponblurb'] = $_GET["coupon"];$values['couponget']=$coupon['couponget'];
+    }
+	
+    if ($id) $formstyle=$id; else $formstyle='default';
 	if (!empty($qpp['title'])) $qpp['title'] = '<'.$hd.'>' . $qpp['title'] . '</'.$hd.'>';
 	if (!empty($qpp['blurb'])) $qpp['blurb'] = '<p>' . $qpp['blurb'] . '</p>';
+    
     $content = '<div class="qpp-style '.$formstyle.'"><div id="'.$style['border'].'">';
 
     if (count($errors) > 0) {
@@ -637,6 +627,27 @@ $required = (!$errors['use_stock'] && $qpp['ruse_stock'] ? ' class="required" ' 
 	echo $content;
 }
 
+function qpp_dropdown($arr,$values,$name,$blurb) {
+    $content='';
+    if ($blurb) $content = '<p class="payment" >'.$blurb.'</p>';
+    $content .= '<select name="'.$name.'">';
+    if(!$values['combine']) {
+        foreach ($arr as $item) {
+            $selected = '';
+            if ($values[$name] == $item) $selected = 'selected';
+            $content .= '<option value="' .  $item . '" ' . $selected .'>' .  $item . '</option>'."\r\t";
+        }
+    } else {
+        foreach ($arr as $item) {
+            $selected = (strrpos($values['reference'],$item[0]) !==false && $values['combine'] != 'initial' ? 'selected' : '');
+            $content .=  '<option value="' .  $item[0].'&'.$item[1] . '" ' . $selected . '> ' .  $item[0].' '.$item[1] . '</option>';$selected='';
+        }
+    }
+    $content .= '</select>'."\r\t";
+    return $content;
+}
+
+
 function explode_by_semicolon ($_) {return explode (';', $_);}
 
 function qpp_handling ($qpp,$check,$quantity){
@@ -719,6 +730,7 @@ function qpp_process_form($values,$id) {
     $currency = qpp_get_stored_curr();
     $qpp = qpp_get_stored_options($id);
     $send = qpp_get_stored_send($id);
+    $auto = qpp_get_stored_autoresponder($id);
     $coupon = qpp_get_stored_coupon($id);
     $address = qpp_get_stored_address($id);
     $style = qpp_get_stored_style($id);
@@ -761,6 +773,9 @@ function qpp_process_form($values,$id) {
    	if(!is_array($qpp_messages)) $qpp_messages = array();
 	$sentdate = date_i18n('d M Y');
     $amounttopay = $check * $quantity + $handling + $packing;
+    if ($send['combine']) {
+        $check = $check + $handling + $packing;
+    }
     if ($qpp['stock'] == $values['stock']) $values['stock'] ='';
     $arr = array(
         'email',
@@ -800,12 +815,11 @@ function qpp_process_form($values,$id) {
         'field18' => $custom
     );
     update_option('qpp_messages'.$id,$qpp_messages);
-    
-    if ($send['thankyou'] && $values['email'] && $send['whenconfirm'] == 'aftersubmission') {
+
+    if ($auto['enable'] && $values['email'] && $auto['whenconfirm'] == 'aftersubmission') {
         $amounttopay = qpp_total_amount ($currency,$qpp,$values);
         qpp_send_confirmation($values,$id,$amounttopay);
     }
-
     $content = '<h2 id="qpp_reload">'.$send['waiting'].'</h2>
     <script type="text/javascript" language="javascript">
     document.querySelector("#qpp_reload").scrollIntoView();
@@ -846,12 +860,13 @@ function qpp_process_form($values,$id) {
             $content .= '<input type="hidden" name="on0" value="'.$qpp['optionlabel'].'" />
             <input type="hidden" name="os0" value="'.$values['option1'].'" />';
         }
-        if ($qpp['useprocess']) {
-            $content .='<input type="hidden" name="handling" value="' . $handling . '">';
-        }
-        if ($qpp['usepostage']) {
-            $content .='
-            <input type="hidden" name="shipping" value="' . $packing . '">';
+        if (!$send['combine']) {
+            if ($qpp['useprocess']) {
+                $content .='<input type="hidden" name="handling" value="' . $handling . '">';
+            }
+            if ($qpp['usepostage']) {
+                $content .='<input type="hidden" name="shipping" value="' . $packing . '">';
+            }
         }
     }
     
@@ -1065,13 +1080,14 @@ function qpp_messagetable ($id,$email) {
     $address = qpp_get_stored_address($id);
     $c = qpp_currency ($id);
     $showthismany = '9999';
+    $content = $padding = $count = $arr = '';
     if ($messageoptions['messageqty'] == 'fifty') $showthismany = '50';
     if ($messageoptions['messageqty'] == 'hundred') $showthismany = '100';
     $$messageoptions['messageqty'] = "checked";
     $$messageoptions['messageorder'] = "checked";
     if(!is_array($message)) $message = array();
     $title = $id; if ($id == '') $title = 'Default';
-    if (!$email) $dashboard .= '<div class="wrap"><div id="qpp-widget">';
+    if (!$email) $dashboard = '<div class="wrap"><div id="qpp-widget">';
     else $padding = 'cellpadding="5"';      
     $dashboard .= '<table cellspacing="0" '.$padding.'><tr>';
     if (!$email) $dashboard .= '<th></th>';
@@ -1123,7 +1139,7 @@ function qpp_messagetable ($id,$email) {
 function qpp_messagecontent ($id,$value,$options,$c,$messageoptions,$address,$arr,$i,$email) {
     $qpp_setup = qpp_get_stored_setup();
     $qpp_ipn = qpp_get_stored_ipn();
-    $content .= '<tr>';
+    $content = '<tr>';
     if (!$email) $content .= '<td><input type="checkbox" name="'.$i.'" value="checked" /></td>';
     $content .= '<td>'.strip_tags($value['field0']).'</td>';
     foreach (explode( ',',$options['sort']) as $name) {
@@ -1245,8 +1261,8 @@ function qpp_ipn () {
             for($i = 0; $i <= $count; $i++) {
                 if ($message[$i]['field18'] == $custom) {
                     $message[$i]['field18'] = 'Paid';
-                    $send = qpp_get_stored_send($item);
-                    if ($send['thankyou'] && $message[$i]['field8'] && $send['whenconfirm'] == 'afterpayment' ) {
+                    $auto = qpp_get_stored_autoresponder($item);
+                    if ($auto['enable'] && $message[$i]['field8'] && $auto['whenconfirm'] == 'afterpayment' ) {
                         $values = array(
                             'reference' => $message[$i]['field1'],
                             'quantity' => $message[$i]['field2'],
@@ -1274,16 +1290,26 @@ function qpp_ipn () {
 }
 
 function qpp_send_confirmation ($values,$id,$amounttopay) {
+
     $qpp_setup = qpp_get_stored_setup();
     $qpp = qpp_get_stored_options($id);
     $send = qpp_get_stored_send($id);
+    $auto = qpp_get_stored_autoresponder($id);
+    
+    
+    if (empty($auto['fromemail'])) {
+        $auto['fromemail'] = $qpp_setup['email'];
+    }
+    if (empty($auto['fromname'])) {
+        $auto['fromname'] = get_bloginfo('name');
+    }
+    
     $currency = qpp_get_stored_curr();
-    if ($send['thankyou'] && $values['email']) {
-        $headers = "From: <{$qpp_setup['email']}>\r\n"
+        $headers = "From: {$auto['fromname']} <{$auto['fromemail']}>\r\n"
 . "MIME-Version: 1.0\r\n"
 . "Content-Type: text/html; charset=\"utf-8\"\r\n";	
-        $subject = $values['reference'];
-        $content = '<p>' . $send['thankyoumessage'] . '</p>
+        $subject = $auto['subject'];
+        $content = '<p>' . $auto['message'] . '</p>
 <table>
 <tr>
 <td>'.$qpp['inputreference'].': </td>
@@ -1306,8 +1332,7 @@ $content .= '<tr>
 <td>'.$amounttopay.' '.$currency[$id].'</td>
 </tr>
 </table>';
-        wp_mail($values['email'], $subject, $content, $headers);
-    }      
+        wp_mail($values['email'], $subject, $content, $headers);      
 }
 
 function qpp_total_amount ($currency,$qpp,$values) {

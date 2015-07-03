@@ -166,8 +166,7 @@ function qpp_get_default_send() {
         'waiting' => 'Waiting for PayPal...',
         'cancelurl' => '',
         'thanksurl' => '',
-        'target' => 'current',
-        'whenconfirm' => 'aftersubmisson'
+        'target' => 'current'
     );
     return $send;
 }
@@ -302,4 +301,35 @@ function qpp_get_default_address () {
         'night_phone_b' => 'Phone Number'
     );
     return $address;
+}
+
+function qpp_get_stored_autoresponder ($id) {
+    $auto = get_option('qpp_autoresponder'.$id);
+    if(!is_array($auto)) {
+        $send = qpp_get_stored_send($id);
+        if ($send['thankyou']) {
+            $auto = array(
+                'enable' => $send['thankyou'],
+                'subject' => 'Thank you for your payment.',
+                'whenconfirm' => $send['whenconfirm'],
+                'message' => $send['thankyoumessage'],
+                'paymentdetails' => 'checked',
+                'fromname' => '',
+                'fromemail' => '',
+            );
+            $send['thankyou'] = '';
+            update_option( 'qpp_send'.$id, $send );
+        } else {
+            $auto = array(
+                'enable' => '',
+                'subject' => 'Thank you for your payment.',
+                'whenconfirm' => 'aftersubmission',
+                'message' => 'Once payment has been confirmed we will process your order and be in contanct soon.',
+                'paymentdetails' => 'checked',
+                'fromname' => '',
+                'fromemail' => '',
+            );
+        }
+    }
+    return $auto;
 }
