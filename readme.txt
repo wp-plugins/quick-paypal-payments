@@ -23,6 +23,7 @@ Taking PayPal payments just got easier, one shortcode to collect any amount from
 *	Add custom forms anywhere on your site
 *	Downloadable payment records
 *   Instant Payment Notifications
+*   Fully editable autoresponder
 
 = Developers plugin page =
 
@@ -67,6 +68,9 @@ At the bottom of the dashboard is a link called 'Payments'.
 If it all goes wrong, just reinstall the plugin and start again. If you need help then [contact me](http://quick-plugins.com/quick-paypal-payments/).
 
 == Changelog ==
+
+= 3.17 =
+*   Autoresponder Shortcodes
 
 = 3.16 =
 *   All new Autoresponder

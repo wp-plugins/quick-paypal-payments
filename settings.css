@@ -11,6 +11,7 @@
 .qpp-options input#submit {background: #343838;color: #FFF;}
 .qpp-options ul {margin: 0;padding: 0;}
 .qpp-options table {width:100%;}
+.qpp-options th {text-align:left;}
 .qpp-options td {vertical-align:top;}
 
 #qpp_sort { list-style-type: none; margin: 0; padding: 0; width:100%; }

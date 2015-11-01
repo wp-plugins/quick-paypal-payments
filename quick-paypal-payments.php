@@ -3,9 +3,10 @@
 Plugin Name: Quick Paypal Payments
 Plugin URI: http://quick-plugins.com/quick-paypal-payments/
 Description: Accept any amount or payment ID before submitting to paypal.
-Version: 3.16
+Version: 3.17
 Author: fisicx
 Author URI: http://quick-plugins.com/
+Text-domain: quick-paypal-plugins
 */
 
 add_shortcode('qpp', 'qpp_loop');
@@ -299,10 +300,14 @@ function qpp_display_form( $values, $errors, $id ) {
             
             case 'field2':
             if ($qpp['use_stock']) {
-$required = (!$errors['use_stock'] && $qpp['ruse_stock'] ? ' class="required" ' : '');
-                $content .= '<p>
-                <input type="text" '.$required.$errors['use_stock'].' label="stock" name="stock" value="' . $values['stock'] . '" onfocus="qppclear(this, \'' . $values['stock'] . '\')" onblur="qpprecall(this, \'' . $values['stock'] . '\')"/>
+                $required = (!$errors['use_stock'] && $qpp['ruse_stock'] ? ' class="required" ' : '');
+                $content .= '<p>';
+                if ($qpp['fixedstock']) {
+                    $content .= '<p class="input" >'.$values['stock'].'<input type="hidden" name="stock" value="' . $values['stock'] . '" /></p>';
+                } else {
+                    $content .= '<p><input type="text" '.$required.$errors['use_stock'].' label="stock" name="stock" value="' . $values['stock'] . '" onfocus="qppclear(this, \'' . $values['stock'] . '\')" onblur="qpprecall(this, \'' . $values['stock'] . '\')"/>
                 </p>';
+                }
             }
             break;	
             
@@ -720,7 +725,7 @@ function qpp_verify_form(&$v,&$errors,$form) {
             if ($address['r'.$item] && ($v[$item] == $address[$item] || empty($v[$item]))) $errors[$item] = 'error';
         }
     }
-    if ($qpp['use_stock'] && $qpp['ruse_stock'] && ($v['stock'] == $qpp['use_stock'] || empty($v['stock'])))
+    if (!$qpp['fixedstock'] && $qpp['use_stock'] && $qpp['ruse_stock'] && ($v['stock'] == $qpp['use_stock'] || empty($v['stock'])))
         $errors['use_stock'] = 'error';
     $errors = array_filter($errors);
     return (count($errors) == 0);
@@ -776,7 +781,7 @@ function qpp_process_form($values,$id) {
     if ($send['combine']) {
         $check = $check + $handling + $packing;
     }
-    if ($qpp['stock'] == $values['stock']) $values['stock'] ='';
+    if ($qpp['stock'] == $values['stock'] && !$qpp['fixedstock']) $values['stock'] ='';
     $arr = array(
         'email',
         'firstname',
@@ -815,8 +820,8 @@ function qpp_process_form($values,$id) {
         'field18' => $custom
     );
     update_option('qpp_messages'.$id,$qpp_messages);
-
-    if ($auto['enable'] && $values['email'] && $auto['whenconfirm'] == 'aftersubmission') {
+    
+    if (($auto['enable'] && $values['email'] && $auto['whenconfirm'] == 'aftersubmission') || $send['confirmmessage']) {
         $amounttopay = qpp_total_amount ($currency,$qpp,$values);
         qpp_send_confirmation($values,$id,$amounttopay);
     }
@@ -1269,7 +1274,9 @@ function qpp_ipn () {
                             'amount' => $message[$i]['field3'],
                             'stock' => $message[$i]['field4'],
                             'option1' => $message[$i]['field5'],
-                            'email' => $message[$i]['field8']
+                            'email' => $message[$i]['field8'],
+                            'firstname' => $message[$i]['field9'],
+                            'lastname' => $message[$i]['field10']
                         );
                         qpp_send_confirmation($values,$item,$message[$i]['field3']);
                     }
@@ -1295,7 +1302,7 @@ function qpp_send_confirmation ($values,$id,$amounttopay) {
     $qpp = qpp_get_stored_options($id);
     $send = qpp_get_stored_send($id);
     $auto = qpp_get_stored_autoresponder($id);
-    
+    $c = qpp_currency ($id);
     
     if (empty($auto['fromemail'])) {
         $auto['fromemail'] = $qpp_setup['email'];
@@ -1304,35 +1311,57 @@ function qpp_send_confirmation ($values,$id,$amounttopay) {
         $auto['fromname'] = get_bloginfo('name');
     }
     
-    $currency = qpp_get_stored_curr();
-        $headers = "From: {$auto['fromname']} <{$auto['fromemail']}>\r\n"
+    $fullamount = $c['b'].$amounttopay.$c['a'];
+    $headers = "From: {$auto['fromname']} <{$auto['fromemail']}>\r\n"
 . "MIME-Version: 1.0\r\n"
 . "Content-Type: text/html; charset=\"utf-8\"\r\n";	
-        $subject = $auto['subject'];
-        $content = '<p>' . $auto['message'] . '</p>
-<table>
-<tr>
-<td>'.$qpp['inputreference'].': </td>
-<td>'.$values['reference'].'</td>
-</tr>
-<tr>
-<td>'.$qpp['quantitylabel'].': </td>
-<td>'.$values['quantity'].'</td>
-</tr>';
-if ($qpp['use_stock']) $content .= '<tr>
-<td>'.$qpp['stocklabel'].': </td>
-<td>' . strip_tags($values['stock']) . '</td>
-</tr>';
-if ($qpp['use_options']) $content .= '<tr>
-<td>'.$qpp['optionlabel'].': </td>
-<td>' . strip_tags($values['option1']) . '</td>
-</tr>';
-$content .= '<tr>
-<td>'.$qpp['inputamount'].': </td>
-<td>'.$amounttopay.' '.$currency[$id].'</td>
-</tr>
-</table>';
-        wp_mail($values['email'], $subject, $content, $headers);      
+    $subject = $auto['subject'];
+    
+    $ref = ($qpp['shortcodereference'] ? $qpp['shortcodereference'] : 'Reference');
+    if ($qpp['fixedreference']) $qpp['inputreference'] = $ref;
+    $amt = ($qpp['shortcodeamount'] ? $qpp['shortcodeamount'] : 'Amount');
+    if ($qpp['fixedamount']) $qpp['inputamount'] = $amt;
+
+    $details = '<table>
+    <tr><td>'.$qpp['inputreference'].': </td><td>'.$values['reference'].'</td></tr><tr><td>'.$qpp['quantitylabel'].': </td><td>'.$values['quantity'].'</td></tr>';
+    if ($qpp['use_stock']) $details .= '<tr><td>'.$qpp['stocklabel'].': </td><td>' . strip_tags($values['stock']) . '</td></tr>';
+    if ($qpp['use_options']) $details .= '<tr><td>'.$qpp['optionlabel'].': </td><td>' . strip_tags($values['option1']) . '</td></tr>';
+    $details .= '<tr><td>'.$qpp['inputamount'].': </td><td>'.$amounttopay.'</td></tr></table>';
+    
+    $content = '<p>' . $auto['message'] . '</p>';
+    $content = str_replace('<p><p>', '<p>', $content);
+    $content = str_replace('</p></p>', '</p>', $content);
+    $content = str_replace('[firstname]', $values['firstname'], $content);
+    $content = str_replace('[name]', $values['firstname'].' '.$values['lastname'], $content);
+    $content = str_replace('[reference]', $values['reference'], $content);
+    $content = str_replace('[fullamount]', $fullamount, $content);
+    $content = str_replace('[amount]', $amounttopay, $content);
+    $content = str_replace('[stock]', $values['stock'], $content);
+    $content = str_replace('[option]', $values['option1'], $content);
+    $content = str_replace('[details]', $details, $content);
+    
+    if ($auto['paymentdetails']) {
+        $content .= $details;
+    }
+    wp_mail($values['email'], $subject, $content, $headers);
+    
+    if ($send['confirmmessage']) {
+        $subject = 'Payment for '.$values['reference'];
+        if ($qpp['useaddress']) {
+            $contentb .= '<tr><td>'.$address['email'].'</td><td>'.$values['email'].'</td></tr></tr>
+            <tr><td>'.$address['firstname'].'</td><td>'.$values['firstname'].'</td></tr>
+            <tr><td>'.$address['lastname'].'</td><td>'.$values['lastname'].'</td></tr>
+            <tr><td>'.$address['address1'].'</td><td>'.$values['address1'].'</td></tr>
+            <tr><td>'.$address['address2'].'</td><td>'.$values['address2'].'</td></tr>
+            <tr><td>'.$address['city'].'</td><td>'.$values['city'].'</td></tr>
+            <tr><td>'.$address['state'].'</td><td>'.$values['state'].'</td></tr>
+            <tr><td>'.$address['zip'].'</td><td>'.$values['zip'].'</td></tr>
+            <tr><td>'.$address['country'].'</td><td>'.$values['country'].'</td></tr>
+            <tr><td>'.$address['night_phone_b'].'</td><td>'.$values['night_phone_b'].'</td></tr>';
+        }
+        $content = $cotenta.$contentb.$contentc;
+        wp_mail($qpp_setup['email'], $subject, $content, $headers);
+    }
 }
 
 function qpp_total_amount ($currency,$qpp,$values) {

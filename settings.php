@@ -213,6 +213,7 @@ function qpp_form_options($id) {
             'quantitylabel',
             'use_stock',
             'ruse_stock',
+            'fixedstock',
             'stocklabel',
             'use_options',
             'optionlabel',
@@ -352,7 +353,7 @@ function qpp_form_options($id) {
             $type = 'Use Item Number';
             $input = 'stocklabel';
             $checked = $qpp['use_stock'];
-            $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="ruse_stock" ' . $qpp['ruse_stock'] . ' value="checked" /> Required Field';
+            $options = '<input type="checkbox" style="margin:0; padding: 0; border: none" name="fixedstock" ' . $qpp['fixedstock'] . ' value="checked" /> Display as a pre-set item number<br><input type="checkbox" style="margin:0; padding: 0; border: none" name="ruse_stock" ' . $qpp['ruse_stock'] . ' value="checked" /> Required Field';
             break;
             case 'field3': 
             $check = ($qpp['userecurring'] ? '&nbsp;' :'<input type="checkbox"  style="margin:0; padding: 0; border: none" name="use_quantity" ' . $qpp['use_quantity'] . ' value="checked" />');
@@ -508,7 +509,7 @@ function qpp_form_options($id) {
     }
     $content .='</ul>
     <h2>Fixed payment and shortcode labels</h2>
-    <p>These are the labels that will display if you are using a fixed reference or amount or <a href="?page=quick-paypal-payments/settings.php&tab=shortcodes">shortcode attributes</a>.</p>
+    <p>These are the labels that will display if you are using a fixed reference or amount or shortcode attributes</a>. All the shortcodes are given <a href="http://quick-plugins.com/quick-paypal-payments/paypal-payments-shortcodes/" target="_blank">on this page</a>.</p>
     <p>Label for the payment Reference/ID/Number:</p>
     <input type="text" name="shortcodereference" value="' . $qpp['shortcodereference'] . '" />
     <p>Label for the amount field:</p>
@@ -829,7 +830,9 @@ function qpp_send_page($id) {
             'target',
             'email',
             'donate',
-            'combine'
+            'combine',
+            'confirmmessage',
+            'google_onclick'
         );
         foreach ($options as $item) {
             $send[$item] = stripslashes( $_POST[$item]);
@@ -900,6 +903,7 @@ function qpp_send_page($id) {
     <p>URL of thank you page</p>
     <input type="text" style="width:100%" name="thanksurl" value="' . $send['thanksurl'] . '" />
     <h2>Confirmation Message</h2>
+    <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="confirmmessage" ' . $send['confirmmessage'] . ' value="checked" /> Send yourself a copy of the payment details.</p>
     <p>You can sen the payee a confirmation message using the <a href="?page=quick-paypal-payments/settings.php&tab=autoresponce">Auto Responder</a> options.</p>
     <h2>Custom Paypal Settings</h2>
     <p><input type="checkbox" style="margin:0; padding: 0; border: none" name="donate" ' . $send['donate'] . ' value="checked" /> Form is for donations only</p>
@@ -910,6 +914,8 @@ function qpp_send_page($id) {
     <p><input type="text" style="width:100%" name="email" value="' . $send['email'] . '" /></p>
     <p><input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="target" value="current" ' . $current . ' /> Open in existing page<br>
     <input style="width:20px; margin: 0; padding: 0; border: none;" type="radio" name="target" value="newpage" ' . $newpage . ' /> Open link in new page/tab <span class="description">This is very browser dependant. Use with caution!</span></p>
+    <h2>Google onClick Event</h2>
+    <p><input type="text" style="width:100%" name="google_onclick" value="' . $send['google_onclick'] . '" /></p>
     <p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the form settings?\' );"/></p>';
     $content .= wp_nonce_field("save_qpp");
     $content .= '</form>
@@ -1087,7 +1093,50 @@ function qpp_autoresponce_page($id) {
     <p>Message Content</p>';
     echo $content;
     wp_editor($message, 'message', $settings = array('textarea_rows' => '20','wpautop'=>false));
-    $content ='<p><input type="checkbox" style="margin: 0; padding: 0; border: none;" name="paymentdetails"' . $auto['paymentdetails'] . ' value="checked" /> Add payment details to the message</p> 
+    $content = '<p>You can use the following shortcodes in the message body:</p>
+    <table>
+    <tr>
+    <th>Shortcode</th>
+    <th>Replacement Text</th>
+    </tr>
+    <tr>
+    <td>[firstname]</td>
+    <td>The registrants first name if you are using the <a href="?page=quick-paypal-payments/settings.php&tab=address">personal details</a> option.</td>
+    </tr>
+    <tr>
+    <td>[name]</td>
+    <td>The registrants first and last name if you are using the <a href="?page=quick-paypal-payments/settings.php&tab=address">personal details</a> option.</td>
+    </tr>
+    <tr>
+    <td>[reference]</td>
+    <td>The name of the item being purchased</td>
+    </tr>
+    <tr>
+    <td>[amount]</td>
+    <td>The total amount to be paid without the currency symbol</td>
+    </tr>
+    <tr>
+    <td>[fullamount]</td>
+    <td>The total amount to be paid with currency symbol</td>
+    </tr>
+    <tr>
+    <td>[quantity]</td>
+    <td>The number of items purchased</td>
+    </tr>
+    <tr>
+    <td>[option]</td>
+    <td>The option selected</td>
+    </tr>
+    <tr>
+    <td>[stock]</td>
+    <td>The stock, SKU or item number</td>
+    </tr>
+    <tr>
+    <td>[details]</td>
+    <td>The payment information (reference, quantity, options, stock number, amount)</td>
+    </tr>
+    </table>
+    <p><input type="checkbox" style="margin: 0; padding: 0; border: none;" name="paymentdetails"' . $auto['paymentdetails'] . ' value="checked" /> Add payment details to the message</p> 
     <p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the error settings for '.$id.'?\' );"/></p>';
     $content .= wp_nonce_field("save_qpp");
     $content .= '</form>
@@ -1141,63 +1190,75 @@ function qpp_address($id) {
     else $content .='<h2>Personal Information Fields</h2>';
     $content .= qpp_change_form($qpp_setup);
     $content .= '<form method="post" action="">
-    <p>Delete labels for fields you do not want to use.</p>
-    <p>The information will be collected and saved and passed to PayPal but usage is dependant on browser and user settings.</p>
+    <p class="description">Note: The information will be collected and saved and passed to PayPal but usage is dependant on browser and user settings. Which means they may have to fill in the information again when they get to PayPal</p>
+    <p>1. Delete labels for fields you do not want to use.</p>
+    <p>2. Check the <b>R</b> box for madatory/required fields.</p>
     <table>
     <tr>
-    <th>R</th>
+    
     <th>Field</th>
     <th>Label</th>
+    <th>R</th>
     </tr>
     <tr>
-    <td width="5%"><input type="checkbox" name="rfirstname" ' . $address['rfirstname'] . ' value="checked" /></td>
+    
     <td width="20%">First Name</td>
     <td><input type="text"  style="width:100%" name="firstname" value="' . $address['firstname'] . '" /></td>
+    <td width="5%"><input type="checkbox" name="rfirstname" ' . $address['rfirstname'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rlastname" ' . $address['rlastname'] . ' value="checked" /></td>
+    
     <td>Last Name</td>
     <td><input type="text"  style="width:100%" name="lastname" value="' . $address['lastname'] . '" /></td>
+    <td><input type="checkbox" name="rlastname" ' . $address['rlastname'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="remail" ' . $address['remail'] . ' value="checked" /></td>
+    
     <td>Email</td>
     <td><input type="text" style="width:100%" name="email" value="' . $address['email'] . '" /></td>
+    <td><input type="checkbox" name="remail" ' . $address['remail'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="raddress1" ' . $address['raddress1'] . ' value="checked" /></td>
+    
     <td>Address Line 1</td>
     <td><input type="text" style="width:100%" name="address1" value="' . $address['address1'] . '" /></td>
+    <td><input type="checkbox" name="raddress1" ' . $address['raddress1'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="raddress2" ' . $address['raddress2'] . ' value="checked" /></td>
+    
     <td>Address Line 2</td>
     <td><input type="text" style="width:100%" name="address2" value="' . $address['address2'] . '" /></td>
+    <td><input type="checkbox" name="raddress2" ' . $address['raddress2'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rcity" ' . $address['rcity'] . ' value="checked" /></td>
+    
     <td>City</td>
     <td><input type="text" style="width:100%" name="city" value="' . $address['city'] . '" /></td>
+    <td><input type="checkbox" name="rcity" ' . $address['rcity'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rstate" ' . $address['rstate'] . ' value="checked" /></td>
+    
     <td>State</td>
     <td><input type="text" style="width:100%" name="state" value="' . $address['state'] . '" /></td>
+    <td><input type="checkbox" name="rstate" ' . $address['rstate'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rzip" ' . $address['rzip'] . ' value="checked" /></td>
+    
     <td>Zip</td>
     <td><input type="text" style="width:100%" name="zip" value="' . $address['zip'] . '" /></td>
+    <td><input type="checkbox" name="rzip" ' . $address['rzip'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rcountry" ' . $address['rcountry'] . ' value="checked" /></td>
+    
     <td>Country</td>
     <td><input type="text" style="width:100%" name="country" value="' . $address['country'] . '" /></td>
+    <td><input type="checkbox" name="rcountry" ' . $address['rcountry'] . ' value="checked" /></td>
     </tr>
     <tr>
-    <td><input type="checkbox" name="rnight_phone_b" ' . $address['rnight_phone_b'] . ' value="checked" /></td>
+    
     <td>Phone</td>
     <td><input type="text" style="width:100%" name="night_phone_b" value="' . $address['night_phone_b'] . '" /></td>
+    <td><input type="checkbox" name="rnight_phone_b" ' . $address['rnight_phone_b'] . ' value="checked" /></td>
     </tr>
     </table>
     <p><input type="submit" name="Submit" class="button-primary" style="color: #FFF;" value="Save Changes" /> <input type="submit" name="Reset" class="button-primary" style="color: #FFF;" value="Reset" onclick="return window.confirm( \'Are you sure you want to reset the error message?\' );"/></p>';
